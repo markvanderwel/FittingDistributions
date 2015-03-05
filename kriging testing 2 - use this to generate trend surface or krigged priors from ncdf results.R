@@ -1,4 +1,4 @@
-###
+##
 library(filzbach)
 library(ncdf4)
 library(colorRamps)
@@ -18,12 +18,12 @@ cols<-colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","r
 #   "FittingOutput - FourthPass,TighterPriors.nc",
 #   "FittingOutput - FifthPassNeighbourhoodPriors.nc",
 #   "FittingOutput - SixthPassNeighbourhoodPriors.nc",
-#   "FittingOutput - SeventhPassNeighbourhoodPriors.nc"
-#   #"FittingOutput - EighthPassNeighbourhoodPriors.nc",
+#   "FittingOutput - SeventhPassNeighbourhoodPriors.nc",
+#   "FittingOutput - EighthPassNeighbourhoodPriors.nc"
 #   #"FittingOutput.nc"
 # )
 # p.sd.out<-matrix(nrow=10,ncol=54)
-# for (ip in 1:7) {
+# for (ip in 1:8) {
 #   nc <- nc_open(paste("D:\\code\\UF\\io\\",fns[ip],sep=""), readunlim=F)
 
   
