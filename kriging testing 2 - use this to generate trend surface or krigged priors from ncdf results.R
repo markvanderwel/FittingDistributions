@@ -372,6 +372,6 @@ for (iD in demo) {
 
 
 #save output file
-write.csv(pardata,file="PriorsOut.csv")
+#write.csv(pardata,file="PriorsOut.csv")
 
 
