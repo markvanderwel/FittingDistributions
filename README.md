@@ -5,14 +5,14 @@ Created 4/3/15
 
 File descriptions:
 
-##GITHUB FILES
+##### GitHub files
 * .gitignore
 * README.md
 
-##R PROJECT FILE
+##### R Project file
 * Fitting distributions.Rproj 
 
-##R SCRIPTS
+##### R Scripts
 * cain gof - use this to create figures used in ESA 2014 talk (incl animation).R 	
   * generates figures from esa talk
 * compare modelled diam distributions to fia.R 	
@@ -26,7 +26,7 @@ File descriptions:
 * plotcompclustering.R 
   * clusters plots within grid cells based on species composition
 
-##DATA FILES
+##### Data files
 * FittingOutput.nc 
   * main model output file
 * HarvestPlotsList.csv 
