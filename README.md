@@ -5,31 +5,31 @@ Created 4/3/15
 
 File descriptions:
 
-#GITHUB FILES
+##GITHUB FILES
 * .gitignore
 * README.md
 
-#R PROJECT FILE
+##R PROJECT FILE
 * Fitting distributions.Rproj 
 
-#R SCRIPTS
+##R SCRIPTS
 * cain gof - use this to create figures used in ESA 2014 talk (incl animation).R 	
-  * GENERATES FIGURES FROM ESA TALK
+  * generates figures from esa talk
 * compare modelled diam distributions to fia.R 	
-  * GENERATES FIGURE COMPARING DIAMETER DISTRIBUTIONS
+  * generates figure comparing diameter distributions
 * estimating harvest rates 2.R 
-  * ESTIMATES (AND PLOTS) HARVEST RATES FOR EACH GRID CELL/PLOT CLASS
+  * estimates (and plots) harvest rates for each grid cell/plot class
 * kriging testing 2 - use this to generate trend surface or krigged priors from ncdf results.R 
-  * CREATES (AND PLOTS) SMOOTH TREND SURFACE FOR RATE PARAMETERS, WHICH ARE USED TO AS A HIERARCHICAL PARAMETERS
+  * creates (and plots) smooth trend surface for rate parameters, which are used in hierarchical model 
 * plot rates against climate.R 
-  * COMPARES PRIOR/POSTERIOR DISTRUBTIONS FOR RATE PARAMETERS AGAINST TEMP, PRECIP
+  * compares prior/posterior distributions for rate paramters against temp, precip
 * plotcompclustering.R 
-  * CLUSTERS PLOTS WITHIN GRID CELLS BASED ON SPECIES COMPOSITION
+  * clusters plots within grid cells based on species composition
 
-#DATA FILES
+##DATA FILES
 * FittingOutput.nc 
-  * MAIN MODEL OUTPUT FILE
+  * main model output file
 * HarvestPlotsList.csv 
-  * ESTIMATED HARVEST RATE FOR EACH FIA PLOT
+  * estimated harvest rate for each fia plot
 * plotclasses.csv 
-  * ASSIGNMENTS OF FIA PLOTS TO PLOT CLASSES WITHIN GRID CELLS
+  * assignments of fia plots to plot classes within grid cells
