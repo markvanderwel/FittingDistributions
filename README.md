@@ -19,6 +19,8 @@ File descriptions:
   * generates figure comparing diameter distributions
 * estimating harvest rates 2.R 
   * estimates (and plots) harvest rates for each grid cell/plot class
+* Graphs.R
+  * generates graphs
 * kriging testing 2 - use this to generate trend surface or krigged priors from ncdf results.R 
   * creates (and plots) smooth trend surface for rate parameters, which are used in hierarchical model 
 * plot rates against climate.R 
