@@ -29,6 +29,8 @@ File descriptions:
 ##### Data files
 * FittingOutput.nc 
   * main model output file
+* SimOutWithClimData.nc
+  * output from original model fit only to demographic data
 * HarvestPlotsList.csv 
   * estimated harvest rate for each fia plot
 * plotclasses.csv 
