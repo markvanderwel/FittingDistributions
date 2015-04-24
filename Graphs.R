@@ -60,9 +60,9 @@ celllonlat<- matrix(nrow=length(celltemperature),ncol=2)
 for (i in 1:length(celltemperature)) {
   celllonlat[i,1:2] <- which(temperature==celltemperature[i] & precipitation == cellprecipitation[i],arr.ind=T)
 }
-lonlatclasscell<-array(dim=c(length(lon),length(lat),3),dimnames=c("lon","lat","class"))
+lonlatcell<-matrix(nrow=length(lon),ncol=length(lat))
 for(i in 1:nrow(celllonlat)) {
-  lonlatclasscell[celllonlat[i,1],celllonlat[i,2],cellplotclass[i]+1]<-i
+  lonlatcell[celllonlat[i,1],celllonlat[i,2]]<-i
 }
 
 
@@ -108,7 +108,7 @@ for (iLon in 1:31) {
               
               i <- i + 1
               
-              df.cell[i] <- lonlatclasscell[iLon,iLat,c]
+              df.cell[i] <- lonlatcell[iLon,iLat]
               df.age[i] <- Time[t]
               df.lon[i] <- lon[iLon]
               df.lat[i] <- lat[iLat]
@@ -263,10 +263,10 @@ modeldbh3[,4] <- apply(modeldbh2,1,FUN=weighted.mean,w=fian2,na.rm=T)
 #layout(matrix(1:4,nrow=2,ncol=2,byrow=T))
 #par(mar=c(3,3,1,1))
 
-pdf("FIG3.pdf",width=6.5,height=6.5)
-par(mfrow=c(2,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
+pdf("FIG3.pdf",width=6.5,height=3.5)
+par(mfrow=c(1,4),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
 
-binlabs <- c("Age 0-50","Age 60-70","Age 80+","All")
+binlabs <- c("0-50 y","60-70 y",">80 y","All ages")
 
 for (i in 1:4) {
   
@@ -275,9 +275,9 @@ for (i in 1:4) {
   matplot(dbh-5,
           dbhcomp,
           type="b",
-          pch=1,
+          pch=19,
           lty=1,
-          col=c("black","red"),
+          col=c("black","grey"),
           log="y",
           ylim=c(5e-2,5e3),
           xlim=c(5,95),
@@ -289,10 +289,10 @@ for (i in 1:4) {
 }
 
 legend("topright",
-       c("FIA","CAIN"),
+       c("Observed (FIA)","Predicted (CAIN)"),
        lty=1,
-       pch=1,
-       col=c("black","red"),
+       pch=19,
+       col=c("black","grey60"),
        bty="n"
 )
 
@@ -306,15 +306,13 @@ dev.off()
 
 #Predicted potential growth
 data60<-totdata[totdata$Age==6,]
-gdata60<-data60[order(data60$GrowthBest,data60$Cell,data60$Pft),]
 
-plot(gdata60$ModelledBa,gdata60$GrowthBest,pch=NA)
-for (cell in 1:nrow(unique(celllonlat))){
-    inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
-    celldata<-gdata60[gdata60$Cell %in% inclcells,]
+plot(gdata60$GrowthPrior,gdata60$ModelledBa,pch=NA)
+for (cell in unique(gdata60$Cell)){
+    celldata<-gdata60[gdata60$Cell==cell,]
     for (pft in unique(celldata$Pft)){
       pftdata<-celldata[celldata$Pft==pft,]
-      lines(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,type="l")
+      lines(pftdata$GrowthPrior,pftdata$ModelledBa,col=pftdata$col,type="b")
    }
 }
 
@@ -322,12 +320,12 @@ for (cell in 1:nrow(unique(celllonlat))){
 data60<-totdata[totdata$Age==6,]
 mdata60<-data60[order(data60$Cell,data60$Pft,data60$MortPrior),]
 
-plot(mdata60$MortBest,mdata60$ModelledBa,pch=NA)
+plot(mdata60$MortPrior,mdata60$ModelledBa,pch=NA)
 for (cell in unique(mdata60$Cell)){
   celldata<-mdata60[mdata60$Cell==cell,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
-    lines(pftdata$MortBest,pftdata$ModelledBa,col=pftdata$col,type="b")
+    lines(pftdata$MortPrior,pftdata$ModelledBa,col=pftdata$col,type="b")
   }
 }
 
@@ -335,12 +333,12 @@ for (cell in unique(mdata60$Cell)){
 data60<-totdata[totdata$Age==6,]
 rdata60<-data60[order(data60$Cell,data60$Pft,data60$IngPrior),]
 
-plot(rdata60$IngBest,rdata60$ModelledBa,pch=NA)
+plot(rdata60$IngPrior,rdata60$ModelledBa,pch=NA)
 for (cell in unique(rdata60$Cell)){
   celldata<-rdata60[rdata60$Cell==cell,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
-    lines(pftdata$IngBest,pftdata$ModelledBa,col=pftdata$col,type="b",pch=16)
+    lines(pftdata$IngPrior,pftdata$ModelledBa,col=pftdata$col,type="b",pch=16)
   }
 }
 
