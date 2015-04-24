@@ -259,9 +259,12 @@ fiadbh3[,4] <- apply(fiadbh2,1,FUN=weighted.mean,w=fian2,na.rm=T)
 modeldbh3[,4] <- apply(modeldbh2,1,FUN=weighted.mean,w=fian2,na.rm=T)
 
 
-x11(30,15)
-layout(matrix(1:4,nrow=1,ncol=4,byrow=T))
-par(mar=c(3,3,1,1))
+#x11(15,15)
+#layout(matrix(1:4,nrow=2,ncol=2,byrow=T))
+#par(mar=c(3,3,1,1))
+
+pdf("FIG3.pdf",width=6.5,height=6.5)
+par(mfrow=c(2,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
 
 binlabs <- c("Age 0-50","Age 60-70","Age 80+","All")
 
@@ -292,6 +295,8 @@ legend("topright",
        col=c("black","red"),
        bty="n"
 )
+
+dev.off()
 
 ##############################################################
 #FIGURE: Predicted PFT BA against predicted potential growth, mortality, and
@@ -339,24 +344,14 @@ for (cell in unique(rdata60$Cell)){
 }
 
 ##############################################################
-#FIGURE: Predicted PFT BA against predicted potential growth, mortality, and
-#recruitment
+#FIGURE: Predicted potential growth, mortality, and
+#recruitment (incl upper and lower bounds against climate)
 #Add GrowthPrior and remove colorcode per PFT.
 #For now at 60 years.
 
 data60<-totdata[totdata$Age==6,]
 plot(data60$Temperature,data60$GrowthUpper,pch=16,cex=0.7,col=data60$col)
 points(data60$Temperature,data60$GrowthLower,pch=16,cex=0.7,col=data60$col)
-
-data60<-totdata[totdata$Age==6,]
-plot(data60$Temperature,data60$GrowthUpper,pch=NA)
-arrows(data60$Temperature,data60$GrowthLower,data60$Temperature,
-       data60$GrowthUpper,col=data60$col,length=0,lwd=2)
-
-data60<-totdata[totdata$Age==6,]
-plot(data60$Precipitation,data60$GrowthUpper,pch=NA)
-arrows(data60$Precipitation,data60$GrowthLower,data60$Precipitation,
-       data60$GrowthUpper,col=data60$col,length=0,lwd=2)
 
 ################################################
 #FIGURE: Observed vs. predicted BA per stand age
