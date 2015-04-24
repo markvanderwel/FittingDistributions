@@ -98,11 +98,11 @@ i <- 0
 
 for (iLon in 1:31) {
   for (iLat in 1:27) {
+    for (c in 1:3) {  #plotclass
+      
+      if (!is.na(lonlatclasscell[iLon,iLat,c])) {    
+        for (t in 1:16) {    
     
-    if (!is.na(lonlatcell[iLon,iLat])) {    
-      for (t in 1:16) {    
-        for (c in 1:3) {
-          
           if (nplots[t,c,iLon,iLat] > 9) {         
             for (s in 2:7) {      
               
@@ -307,7 +307,7 @@ dev.off()
 data60<-totdata[totdata$Age==6,]
 gdata60<-data60[order(data60$GrowthBest,data60$Cell,data60$Pft),]
 
-plot(gdata60$ModelledBa,gdata60$GrowthBest,pch=NA)
+plot(gdata60$ModelledBa,gdata60$GrowthBest,pch=NA,log="")
 for (cell in 1:nrow(unique(celllonlat))){
       inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
       celldata<-gdata60[gdata60$Cell %in% inclcells,]
@@ -321,7 +321,7 @@ for (cell in 1:nrow(unique(celllonlat))){
 data60<-totdata[totdata$Age==6,]
 mdata60<-data60[order(data60$MortBest,data60$Cell,data60$Pft),]
 
-plot(mdata60$ModelledBa,mdata60$MortBest,pch=NA)
+plot(mdata60$ModelledBa,mdata60$MortBest,pch=NA,log="")
 for (cell in 1:nrow(unique(celllonlat))){
   inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
   celldata<-mdata60[mdata60$Cell %in% inclcells,]
@@ -335,7 +335,7 @@ for (cell in 1:nrow(unique(celllonlat))){
 data60<-totdata[totdata$Age==6,]
 rdata60<-data60[order(data60$IngBest,data60$Cell,data60$Pft),]
 
-plot(rdata60$ModelledBa,rdata60$IngBest,pch=NA)
+plot(rdata60$ModelledBa,rdata60$IngBest,pch=NA,log="")
 for (cell in 1:nrow(unique(celllonlat))){
   inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
   celldata<-rdata60[rdata60$Cell %in% inclcells,]
