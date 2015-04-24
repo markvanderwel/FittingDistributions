@@ -302,7 +302,6 @@ dev.off()
 #FIGURE: Predicted PFT BA against predicted potential growth, mortality, and
 #recruitment
 #For now at 60 years.
-#Predicted PFT growth seems not to vary within grid cells (nor do the upper and lower values...).
 
 #Predicted potential growth
 data60<-totdata[totdata$Age==6,]
@@ -320,27 +319,29 @@ for (cell in 1:nrow(unique(celllonlat))){
 
 #Predicted potential mortality
 data60<-totdata[totdata$Age==6,]
-mdata60<-data60[order(data60$Cell,data60$Pft,data60$MortPrior),]
+mdata60<-data60[order(data60$MortBest,data60$Cell,data60$Pft),]
 
-plot(mdata60$MortBest,mdata60$ModelledBa,pch=NA)
-for (cell in unique(mdata60$Cell)){
-  celldata<-mdata60[mdata60$Cell==cell,]
+plot(mdata60$ModelledBa,mdata60$MortBest,pch=NA)
+for (cell in 1:nrow(unique(celllonlat))){
+  inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
+  celldata<-mdata60[mdata60$Cell %in% inclcells,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
-    lines(pftdata$MortBest,pftdata$ModelledBa,col=pftdata$col,type="b")
+    lines(pftdata$ModelledBa,pftdata$MortBest,col=pftdata$col,type="l")
   }
 }
 
 #Predicted potential recruitment
 data60<-totdata[totdata$Age==6,]
-rdata60<-data60[order(data60$Cell,data60$Pft,data60$IngPrior),]
+rdata60<-data60[order(data60$IngBest,data60$Cell,data60$Pft),]
 
-plot(rdata60$IngBest,rdata60$ModelledBa,pch=NA)
-for (cell in unique(rdata60$Cell)){
-  celldata<-rdata60[rdata60$Cell==cell,]
+plot(rdata60$ModelledBa,rdata60$IngBest,pch=NA)
+for (cell in 1:nrow(unique(celllonlat))){
+  inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
+  celldata<-rdata60[rdata60$Cell %in% inclcells,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
-    lines(pftdata$IngBest,pftdata$ModelledBa,col=pftdata$col,type="b",pch=16)
+    lines(pftdata$ModelledBa,pftdata$IngBest,col=pftdata$col,type="l")
   }
 }
 
@@ -422,8 +423,8 @@ make.frame2 <- function(time) {
   map(database="state",regions=states,interior=F,add=T)
   
   
-  #plot(NULL,NULL,xlim=0:1,ylim=0:1,xlab="",ylab="",bty="n",xaxt="n",yaxt="n")
-  #text(0.25,0.5, label=paste("Year",Time[time]*10,sep=" "), cex=2.5, adj=0)
+  plot(NULL,NULL,xlim=0:1,ylim=0:1,xlab="",ylab="",bty="n",xaxt="n",yaxt="n")
+  text(0.25,0.5, label=paste("Year",Time[time]*10,sep=" "), cex=2.5, adj=0)
   
 }
 
