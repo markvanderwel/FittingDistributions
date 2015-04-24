@@ -60,9 +60,9 @@ celllonlat<- matrix(nrow=length(celltemperature),ncol=2)
 for (i in 1:length(celltemperature)) {
   celllonlat[i,1:2] <- which(temperature==celltemperature[i] & precipitation == cellprecipitation[i],arr.ind=T)
 }
-lonlatcell<-matrix(nrow=length(lon),ncol=length(lat))
+lonlatclasscell<-array(dim=c(length(lon),length(lat),3),dimnames=c("lon","lat","class"))
 for(i in 1:nrow(celllonlat)) {
-  lonlatcell[celllonlat[i,1],celllonlat[i,2]]<-i
+  lonlatclasscell[celllonlat[i,1],celllonlat[i,2],cellplotclass[i]+1]<-i
 }
 
 
@@ -108,7 +108,7 @@ for (iLon in 1:31) {
               
               i <- i + 1
               
-              df.cell[i] <- lonlatcell[iLon,iLat]
+              df.cell[i] <- lonlatclasscell[iLon,iLat,c]
               df.age[i] <- Time[t]
               df.lon[i] <- lon[iLon]
               df.lat[i] <- lat[iLat]
@@ -306,14 +306,15 @@ dev.off()
 
 #Predicted potential growth
 data60<-totdata[totdata$Age==6,]
-gdata60<-data60[order(data60$Cell,data60$Pft,data60$GrowthPrior),]
+gdata60<-data60[order(data60$GrowthBest,data60$Cell,data60$Pft),]
 
-plot(gdata60$GrowthPrior,gdata60$ModelledBa,pch=NA)
-for (cell in unique(gdata60$Cell)){
-    celldata<-gdata60[gdata60$Cell==cell,]
+plot(gdata60$ModelledBa,gdata60$GrowthBest,pch=NA)
+for (cell in 1:nrow(unique(celllonlat))){
+    inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
+    celldata<-gdata60[gdata60$Cell %in% inclcells,]
     for (pft in unique(celldata$Pft)){
       pftdata<-celldata[celldata$Pft==pft,]
-      lines(pftdata$GrowthPrior,pftdata$ModelledBa,col=pftdata$col,type="b")
+      lines(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,type="l")
    }
 }
 
@@ -321,12 +322,12 @@ for (cell in unique(gdata60$Cell)){
 data60<-totdata[totdata$Age==6,]
 mdata60<-data60[order(data60$Cell,data60$Pft,data60$MortPrior),]
 
-plot(mdata60$MortPrior,mdata60$ModelledBa,pch=NA)
+plot(mdata60$MortBest,mdata60$ModelledBa,pch=NA)
 for (cell in unique(mdata60$Cell)){
   celldata<-mdata60[mdata60$Cell==cell,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
-    lines(pftdata$MortPrior,pftdata$ModelledBa,col=pftdata$col,type="b")
+    lines(pftdata$MortBest,pftdata$ModelledBa,col=pftdata$col,type="b")
   }
 }
 
@@ -334,12 +335,12 @@ for (cell in unique(mdata60$Cell)){
 data60<-totdata[totdata$Age==6,]
 rdata60<-data60[order(data60$Cell,data60$Pft,data60$IngPrior),]
 
-plot(rdata60$IngPrior,rdata60$ModelledBa,pch=NA)
+plot(rdata60$IngBest,rdata60$ModelledBa,pch=NA)
 for (cell in unique(rdata60$Cell)){
   celldata<-rdata60[rdata60$Cell==cell,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
-    lines(pftdata$IngPrior,pftdata$ModelledBa,col=pftdata$col,type="b",pch=16)
+    lines(pftdata$IngBest,pftdata$ModelledBa,col=pftdata$col,type="b",pch=16)
   }
 }
 
