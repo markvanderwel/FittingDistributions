@@ -4,6 +4,7 @@ library(ncdf4)
 library(colorRamps)
 library(maps)
 library(RColorBrewer)
+library(filzbach)
 
 nc <- nc_open("FittingOutput.nc", readunlim=F)
 #print(nc)
@@ -168,6 +169,9 @@ totdata$col<-ifelse(totdata$Pft=="BC","darkblue",
                                   ifelse(totdata$Pft=="NH","green",
                                          ifelse(totdata$Pft=="SC","darkred","red")))))
 
+#Add unique code for cell
+totdata$Lon_Lat<-paste(totdata$Lon,totdata$Lat,sep="_")
+
 ##############################################################
 #FIGURE: Goodness of fit: observed vs predicted PFT basal area
 #Now one panel with symbols per PFT. Six panels instead?
@@ -298,14 +302,70 @@ legend("topright",
 
 dev.off()
 
-##############################################################
+############################################################################
 #FIGURE: Predicted PFT BA against predicted potential growth, mortality, and
 #recruitment
 #For now at 60 years.
 
 #Predicted potential growth
 data60<-totdata[totdata$Age==6,]
+data60$Lon_Lat<-factor(data60$Lon_Lat)
 gdata60<-data60[order(data60$GrowthBest,data60$Cell,data60$Pft),]
+
+#Estimate overall slope, and slopes per grid cell
+#prediction function for species richness
+g_pred<-function(int,slope){
+  return(int + slope*gdata60$ModelledBa)
+}
+
+#Likelihood function
+g_ll<-function(ints,slopes,ints_mean,ints_sd,slopes_mean,slopes_sd,sigma){
+  
+  pred<-g_pred(ints[gdata60$Lon_Lat],slopes[gdata60$Lon_Lat])
+  
+  #likelihood
+  loglike<-sum(dnorm(gdata60$GrowthBest,pred,sigma,log=T))
+  
+  #parameter hierarchy
+  log_int_hier<-sum(dnorm(ints,ints_mean,ints_sd,log=T))
+  log_slope_hier<-sum(dnorm(slopes,slopes_mean,slopes_sd,log=T))
+  
+  return(loglike + log_int_hier + log_slope_hier)
+}
+
+#Retrieve MCMC output
+fb.pars.g<-list(
+  ints=c(-10,10,1,0,0,1,158),
+  slopes = c(-10,10,1,0,0,1,158),
+  ints_mean=c(-10,10,2,0,0,1),
+  ints_sd=c(1e-6,10,2,1,0,1),
+  slopes_mean=c(-10,10,2,0,0,1),
+  slopes_sd=c(1e-6,10,2,1,0,1),
+  sigma=c(1e-6,10,1,1,0,1)
+)
+
+fb.out.g<-filzbach(150000,150000,g_ll,nrow(gdata60),fb.pars.g)
+
+#Converged (mmm...)?
+g_llvec<-function(x) g_ll(x[1:158],x[159:316],x[317],x[318],x[319],x[320],x[321])
+fb.out.g.ll2<-apply(fb.out.g,1,g_llvec)
+plot(fb.out.g.ll2,type="l")
+
+#Calculate goodness of fit
+fb.pm.g<-colMeans(fb.out.g)
+pred<-g_pred((fb.pm.g[1:158])[gdata60$Lon_Lat],(fb.pm.g[159:316])[gdata60$Lon_Lat])
+plot(pred,gdata60$GrowthBest)
+abline(0,1)
+
+#Calculate credible intervals
+fb.ci.g<-apply(fb.out.g,2,FUN=quantile,probs=c(0.025,0.5,0.975))
+fb.ci.g
+cell.slopes.g<-fb.ci.g[2,159:316]
+tot.slope.g<-fb.ci.g[,319]
+
+##################
+##################
+#Make graph panels
 
 plot(gdata60$ModelledBa,gdata60$GrowthBest,pch=NA,log="")
 for (cell in 1:nrow(unique(celllonlat))){
@@ -348,12 +408,107 @@ for (cell in 1:nrow(unique(celllonlat))){
 ##############################################################
 #FIGURE: Predicted potential growth, mortality, and
 #recruitment (incl upper and lower bounds against climate)
-#Add GrowthPrior and remove colorcode per PFT.
-#For now at 60 years.
+#RUN "kriging testing 2" script to generate predictions ("pardata")
 
-data60<-totdata[totdata$Age==6,]
-plot(data60$Temperature,data60$GrowthUpper,pch=16,cex=0.7,col=data60$col)
-points(data60$Temperature,data60$GrowthLower,pch=16,cex=0.7,col=data60$col)
+cols=brewer.pal(6,"Dark2")
+cols.light=rgb(t(col2rgb(cols)),alpha=128,maxColorValue=255)
+
+x11(6,6)
+par(mar=c(2,2,0,0))
+layout(matrix(1:6,nrow=3,byrow=T))
+
+y.lim = list(
+  G = c(exp(-4),exp(1.4)),
+  M = c(exp(2),exp(6.2)),
+  R = c(exp(-2),exp(6.2))
+)
+
+x.lim = list(
+  BC = c(2,9),
+  BH = c(2,10),
+  NC = c(2,14),
+  NH = c(2,20),
+  SC = c(7,23),
+  SH = c(6,22)
+)
+
+col.range.fade <- function(pft,vals){
+  orig.col = cols[pft]
+  fade.col = rgb(t(col2rgb(orig.col)),alpha=20,maxColorValue=255)
+  #fade.col="white"
+  return (ifelse(vals>x.lim[[pft]][1] & vals<x.lim[[pft]][2],orig.col,fade.col))
+}
+
+#Graph panels: first Temp
+for (iDemo in demo) {
+      
+    pardata.sub <- subset(pardata,Demo==iDemo)
+    
+    with(pardata.sub,plot(Temp,exp(LogValue),main=paste("\n",iSp,iDemo,sep=" "),pch=NA,ylim=y.lim[[iDemo]],xlab="",ylab="",log="y"))
+    #with(pardata.sub,plot(Temp,(Prior),col=col.range.fade(which(iSp==species[-1]),Temp),main=paste("\n",iSp,iDemo,sep=" "),ylim=y.lim[[iDemo]],xlab="",ylab="",log="y"))
+    #with(pardata.sub,points(Temp,exp(LogValue),col=rgb(0,0,0,0.3),main=paste("Post",iDemo,sep=" ")))  
+          
+    for (iSp in species[-1]) {
+       
+      pardata.sub.Sp <- subset(pardata.sub, Pft==iSp)
+      
+      indlatlon <- unique(pardata.sub.Sp[,3:4])
+      pardata.sub.Sp$Index <- mapply(FUN=function(x1,x2) 
+      {which(x1==indlatlon[,1] & x2==indlatlon[,2])},
+      pardata.sub.Sp$Lat,
+      pardata.sub.Sp$Lon)
+    
+      pd.horz <- data.frame(
+        Index = unique(pardata.sub.Sp$Index),
+        LogValueMin = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=min),
+        LogValueMed = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=median),
+        LogValueMax = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=max),
+        Temp = tapply(pardata.sub.Sp$Temp,pardata.sub.Sp$Index,FUN=mean),
+        Precip = tapply(pardata.sub.Sp$Precip,pardata.sub.Sp$Index,FUN=mean)
+      )
+    
+      class.cols = c("red","darkgreen","blue")
+    
+      for (iClass in 1:3) {
+        p <- exp(predict(loess(pd.horz[,iClass+1] ~ pd.horz$Temp)))
+        lines(sort(pd.horz$Temp),p[order(pd.horz$Temp)],col=class.cols[iClass],lwd=2)
+      
+      } 
+        
+  }
+  
+  #Same for Precip
+  with(pardata.sub,plot(Precip,exp(LogValue),main=paste("\n",iSp,iDemo,sep=" "),pch=NA,ylim=y.lim[[iDemo]],xlab="",ylab="",log="y"))
+    
+  for (iSp in species[-1]) {
+    
+    pardata.sub.Sp <- subset(pardata.sub, Pft==iSp)
+    
+    indlatlon <- unique(pardata.sub.Sp[,3:4])
+    pardata.sub.Sp$Index <- mapply(FUN=function(x1,x2) 
+    {which(x1==indlatlon[,1] & x2==indlatlon[,2])},
+    pardata.sub.Sp$Lat,
+    pardata.sub.Sp$Lon)
+    
+    pd.horz <- data.frame(
+      Index = unique(pardata.sub.Sp$Index),
+      LogValueMin = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=min),
+      LogValueMed = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=median),
+      LogValueMax = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=max),
+      Temp = tapply(pardata.sub.Sp$Temp,pardata.sub.Sp$Index,FUN=mean),
+      Precip = tapply(pardata.sub.Sp$Precip,pardata.sub.Sp$Index,FUN=mean)
+    )
+    
+    class.cols = c("red","darkgreen","blue")
+    
+    for (iClass in 1:3) {
+      p <- exp(predict(loess(pd.horz[,iClass+1] ~ pd.horz$Precip)))
+      lines(sort(pd.horz$Precip),p[order(pd.horz$Precip)],col=class.cols[iClass],lwd=2)
+      
+    } 
+    
+  }
+}
 
 ################################################
 #FIGURE: Observed vs. predicted BA per stand age
