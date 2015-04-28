@@ -155,13 +155,6 @@ totdata <- data.frame(Cell=df.cell,Age=df.age,Lon=df.lon,Lat=df.lat,PlotClass=df
                    GrowthLower=df.growthlower95,MortLower=df.mortlower95,IngLower=df.inglower95,
                    Temperature=df.celltemperature,Precipitation=df.cellprecipitation)
 
-#Number of plot classes per grid cell
-countClass<-aggregate(totdata[,c("PlotClass")], 
-                      list(totdata$Cell,totdata$Age),function(x) length(unique(x)))
-names(countClass)<-c("Cell","Age","count")
-class3<-countClass[countClass$count==3,]
-#At 60 years?
-
 #Add color code to dataset.
 totdata$col<-ifelse(totdata$Pft=="BC","darkblue",
                     ifelse(totdata$Pft=="BH","lightblue",
@@ -186,7 +179,10 @@ abline(0,1,lwd=2,lty=2)
 dev.off()
 
 #Per functional type instead: 6 panels.
-pdf("FIG2b.pdf",width=6.5,height=8)
+#Change to panel per age class, include colorcode for pft's
+
+x11(6.5,8)
+#pdf("FIG2b.pdf",width=6.5,height=8)
 par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
 
 plot(totdata$ModelledBa[totdata$Pft=="BC"],totdata$FiaBa[totdata$Pft=="BC"],
@@ -219,8 +215,6 @@ mtext(expression("Observed basal area (m"^2*" ha"^-1*")"),
       side=2, line=2, outer=TRUE, adj=0.5, cex=1)
 mtext(expression("Predicted basal area (m"^2*" ha"^-1*")"),
       side=1, line=2.5, outer=TRUE, adj=0.5, cex=1)
-
-dev.off()
 
 ##############################################################
 #FIGURE: Observed vs. predicted size distribution
@@ -267,8 +261,9 @@ modeldbh3[,4] <- apply(modeldbh2,1,FUN=weighted.mean,w=fian2,na.rm=T)
 #layout(matrix(1:4,nrow=2,ncol=2,byrow=T))
 #par(mar=c(3,3,1,1))
 
-pdf("FIG3.pdf",width=6.5,height=3.5)
-par(mfrow=c(1,4),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
+x11(6.5,3.5)
+#pdf("FIG3.pdf",width=6.5,height=3.5)
+par(mfrow=c(1,4),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,2,0.1))
 
 binlabs <- c("0-50 y","60-70 y",">80 y","All ages")
 
@@ -300,78 +295,18 @@ legend("topright",
        bty="n"
 )
 
-dev.off()
-
+############################################################################
 ############################################################################
 #FIGURE: Predicted PFT BA against predicted potential growth, mortality, and
-#recruitment
-#For now at 60 years.
-
-#Add mean ModelledBa
-meanBa<-aggregate(totdata$ModelledBa,list(totdata$Lon_Lat),mean)
-names(meanBa)<-c("Lat_Lon","meanModelledBa")
-
-totdata2<-merge(totdata,meanBa,all.x=T)
-
-#Predicted potential growth
+#recruitment among and within grid cells
 
 #select age
-data<-totdata2[totdata2$Age==5,]
+data<-totdata[totdata$Age==5,]
 data$Lon_Lat<-factor(data$Lon_Lat)
 gdata<-data[order(data$GrowthBest,data$Cell,data$Pft),]
 
-#Estimate overall slope, and slopes per grid cell
-g_pred<-function(int,slope_all,slope_cell){
-  return(int + slope_all*gdata$meanModelledBa + 
-           slope_cell*(gdata$ModelledBa-gdata$meanModelledBa))
-}
-
-#Likelihood function
-g_ll<-function(int,slope_all,slope_cell,slope_cellmean,slope_cellsd,sigma){
-  
-  pred<-g_pred(int,slope_all,slope_cell[gdata$Lon_Lat])
-  
-  #likelihood
-  loglike<-sum(dnorm(gdata$GrowthBest,pred,sigma,log=T))
-  
-  #parameter hierarchy
-  log_slope_hier<-sum(dnorm(slope_cell,slope_cellmean,slope_cellsd,log=T))
-  
-  return(loglike + log_slope_hier)
-}
-
-#Retrieve MCMC output
-fb.pars.g<-list(
-  int=c(-10,10,1,0,0,1),
-  slope_all=c(-10,10,1,0,0,1),
-  slope_cell = c(-10,10,1,0,0,1,158),
-  slope_cellmean=c(-10,10,2,0,0,1),
-  slope_cellsd=c(1e-6,10,2,1,0,1),
-  sigma=c(1e-6,10,1,1,0,1)
-)
-
-fb.out.g<-filzbach(100000,100000,g_ll,nrow(gdata),fb.pars.g)
-
-#Converged (mmm...)?
-g_llvec<-function(x) g_ll(x[1],x[2],x[3:160],x[161],x[162],x[163])
-fb.out.g.ll2<-apply(fb.out.g,1,g_llvec)
-plot(fb.out.g.ll2,type="l")
-
-#Calculate goodness of fit
-fb.pm.g<-colMeans(fb.out.g)
-pred<-g_pred(fb.pm.g[1],fb.pm.g[2],(fb.pm.g[3:160])[gdata$Lon_Lat])
-plot(pred,gdata$GrowthBest)
-abline(0,1)
-
-#Calculate credible intervals
-fb.ci.g<-apply(fb.out.g,2,FUN=quantile,probs=c(0.025,0.5,0.975))
-fb.ci.g
-cell.slopes.g<-fb.ci.g[2,3:159]
-tot.slope.g<-fb.ci.g[,2]
-
-##################
-##################
-#Make graph panels
+x11(width=6.5,height=8)
+par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
 
 plot(gdata$ModelledBa,gdata$GrowthBest,pch=NA,log="")
 for (cell in 1:nrow(unique(celllonlat))){
@@ -382,6 +317,14 @@ for (cell in 1:nrow(unique(celllonlat))){
       lines(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,type="l")
    }
 }
+
+xvals<-c(0.8,1.2,1.8,2.2,2.8,3.2,3.8,4.2,4.8,5.2,5.8,6.2,6.8,7.2)
+yvals<-c(0.09142641,0.09201266,rep(NA,12))
+y_upper<-c(0.09328375,0.1889681,rep(NA,12))
+y_lower<-c(0.09073110,-0.01066076,rep(NA,12))
+plot(xvals,yvals,xaxt="n",ylim=c(-0.02,0.2))
+arrows(xvals,y_lower,xvals,y_upper,code=3,length=0)
+axis(side=1,at=c(1:7),tick=T,labels=c("All","BC","BH","NC","NH","SC","SH"))
 
 #Predicted potential mortality
 
@@ -399,6 +342,14 @@ for (cell in 1:nrow(unique(celllonlat))){
   }
 }
 
+xvals<-c(0.8,1.2,1.8,2.2,2.8,3.2,3.8,4.2,4.8,5.2,5.8,6.2,6.8,7.2)
+yvals<-c(rep(NA,14))
+y_upper<-c(rep(NA,14))
+y_lower<-c(rep(NA,14))
+plot(xvals,yvals,xaxt="n",ylim=c(-0.02,0.2))
+arrows(xvals,y_lower,xvals,y_upper,code=3,length=0)
+axis(side=1,at=c(1:7),tick=T,labels=c("All","BC","BH","NC","NH","SC","SH"))
+
 #Predicted potential recruitment
 
 #select age
@@ -414,6 +365,14 @@ for (cell in 1:nrow(unique(celllonlat))){
     lines(pftdata$ModelledBa,pftdata$IngBest,col=pftdata$col,type="l")
   }
 }
+
+xvals<-c(0.8,1.2,1.8,2.2,2.8,3.2,3.8,4.2,4.8,5.2,5.8,6.2,6.8,7.2)
+yvals<-c(rep(NA,14))
+y_upper<-c(rep(NA,14))
+y_lower<-c(rep(NA,14))
+plot(xvals,yvals,xaxt="n",ylim=c(-0.02,0.2))
+arrows(xvals,y_lower,xvals,y_upper,code=3,length=0)
+axis(side=1,at=c(1:7),tick=T,labels=c("All","BC","BH","NC","NH","SC","SH"))
 
 ##############################################################
 #FIGURE: Predicted potential growth, mortality, and
@@ -522,7 +481,7 @@ for (iDemo in demo) {
 
 ################################################
 #FIGURE: Observed vs. predicted BA per stand age
-#Total BA (instead of per PFT) may be best?
+#Total BA may be best?
 #Use same age classes, or just ages, as for size distributions.
 
 cols<-colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000)
@@ -530,45 +489,36 @@ states=c("Minn","Wisc","Iowa","Ill","Indian","Missou","Arkan","Mississ","Kentu",
          "Flor","Georg","South Car","North Car","Virgini","West Vir","Ohio","Penns","Maryl",
          "Delaw","New Jer","New Yo","Connect","Rhod","Massach","Vermo","New Ham","Main","Michi")
 
-#Calculate sum of observed and predicted BA per grid cell and stand age (sums over plot classes... correct?)
+#Calculate mean observed and predicted BA per grid cell and stand age
 sumBA<-aggregate(totdata[,c("FiaBa","ModelledBa")], 
-                 list(totdata$Cell,totdata$Age,totdata$Lon,totdata$Lat),sum)
-names(sumBA)<-c("Cell","Age","Lon","Lat","sumFiaBa","sumModelledBa")
+                 list(totdata$Cell,totdata$Age,totdata$Lon,totdata$Lat,totdata$PlotClass),mean,na.rm=T)
+names(sumBA)<-c("Cell","Age","Lon","Lat","PlotClass","FiaBa","ModelledBa")
 
-#Make plots
+meanBA<-aggregate(totdata[,c("FiaBa","ModelledBa")], 
+                 list(totdata$Cell,totdata$Age,totdata$Lon,totdata$Lat),mean,na.rm=T)
+names(meanBA)<-c("Cell","Age","Lon","Lat","meanFiaBa","meanModelledBa")
 
-##DOES NOT WORK YET, DOUBLECHECK DATA (SUM PER PLOT/PLOT CLASS?).
-#Original version works fine, but seems to have only one plot class.
-#Add total basal area to ncdf file?
-pdf("FIG1.pdf",width=3.15,height=12)
+##DOES NOT WORK YET
 
 par(mfrow=c(8,2),mar=c(0,0,0,0),oma=c(5,6,0.1,0.1))
 
-for(time in c(1,5)){
-  data <- sumBA[sumBA$Age==time,c("Lon","Lat","sumFiaBa")]
+for(time in c(5)){
+  data <- meanBA[meanBA$Age==time,c("Lon","Lat","meanFiaBa")]
   names(data)<-c("x","y","z")
-  data[data$z>20,]$z<-20
+  data$z[data$z>20]<-20
   
-  m <- with(data, tapply(z, list(x, y), I))
-  image(m,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",
+  m<-list(x=data$x,y=data$y,z=data$z)
+  
+  #problem: also y needs to be in ascending order...
+  image(m$x,m$y,m$z,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",
         xlab="",ylab="",bty="n",asp=1.2)
   map(database="state",regions=states,interior=F,add=T)
-  #map(database="state",regions=states,interior=F)
-  
-  #data <- sumBA[sumBA$Age==time,]
-  #data[data$sumModelledBa>20,]$sumModelledBa<-20
-  #image(data$lon,data$lat,data$sumModelledBa,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",
-  #      xlab="",ylab="",bty="n",asp=1.2)
-  #map(database="state",regions=states,interior=F,add=T)
   
 }
 
-dev.off()
-
-
 #####################################################################################
 #####################################################################################
-#old for BA maps
+#old for BA maps: ADJUSTED
 make.frame2 <- function(time) {
   
   layout(matrix(c(1,2,3),nrow=3,byrow=T),heights=c(1,1,0.3))
@@ -595,3 +545,19 @@ make.frame2 <- function(time) {
 
 x11(1.6667,4)
 make.frame2(8)
+
+#####
+
+#df.fiaba[i] <- fiaba[s,t,c,iLon,iLat]
+#df.modelledba[i] <- modelledba[t,s,c,iLon,iLat]
+
+x <- fiaba[,5,,,]
+x[nplots[5,,,]<10] <- NA
+x2 <- apply(x,2,FUN=sum,na.rm=T)
+x3 <- apply(x,3,FUN=mean,na.rm=T)
+x3[x3>20] <- 20
+image(lon,lat,x3,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
+map(database="state",regions=states,interior=F,add=T)
+
+
+
