@@ -17,8 +17,6 @@ File descriptions:
   * generates figures from esa talk
 * compare modelled diam distributions to fia.R 	
   * generates figure comparing diameter distributions
-* Comparison of slopes within and among grid cells.R
-  * compares slopes of demographic rates vs. predicted BA among and within grid cells
 * estimating harvest rates 2.R 
   * estimates (and plots) harvest rates for each grid cell/plot class
 * Graphs.R
@@ -29,6 +27,8 @@ File descriptions:
   * compares prior/posterior distributions for rate paramters against temp, precip
 * plotcompclustering.R 
   * clusters plots within grid cells based on species composition
+* Slopes comparison within and among grid cells.R
+  * compares slopes of demographic rates vs. predicted BA among and within grid cells
 
 ##### Data files
 * FittingOutput.nc 
