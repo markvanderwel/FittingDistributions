@@ -307,70 +307,76 @@ dev.off()
 #recruitment
 #For now at 60 years.
 
+#Add mean ModelledBa
+meanBa<-aggregate(totdata$ModelledBa,list(totdata$Lon_Lat),mean)
+names(meanBa)<-c("Lat_Lon","meanModelledBa")
+
+totdata2<-merge(totdata,meanBa,all.x=T)
+
 #Predicted potential growth
-data60<-totdata[totdata$Age==6,]
-data60$Lon_Lat<-factor(data60$Lon_Lat)
-gdata60<-data60[order(data60$GrowthBest,data60$Cell,data60$Pft),]
+
+#select age
+data<-totdata2[totdata2$Age==5,]
+data$Lon_Lat<-factor(data$Lon_Lat)
+gdata<-data[order(data$GrowthBest,data$Cell,data$Pft),]
 
 #Estimate overall slope, and slopes per grid cell
-#prediction function for species richness
-g_pred<-function(int,slope){
-  return(int + slope*gdata60$ModelledBa)
+g_pred<-function(int,slope_all,slope_cell){
+  return(int + slope_all*gdata$meanModelledBa + 
+           slope_cell*(gdata$ModelledBa-gdata$meanModelledBa))
 }
 
 #Likelihood function
-g_ll<-function(ints,slopes,ints_mean,ints_sd,slopes_mean,slopes_sd,sigma){
+g_ll<-function(int,slope_all,slope_cell,slope_cellmean,slope_cellsd,sigma){
   
-  pred<-g_pred(ints[gdata60$Lon_Lat],slopes[gdata60$Lon_Lat])
+  pred<-g_pred(int,slope_all,slope_cell[gdata$Lon_Lat])
   
   #likelihood
-  loglike<-sum(dnorm(gdata60$GrowthBest,pred,sigma,log=T))
+  loglike<-sum(dnorm(gdata$GrowthBest,pred,sigma,log=T))
   
   #parameter hierarchy
-  log_int_hier<-sum(dnorm(ints,ints_mean,ints_sd,log=T))
-  log_slope_hier<-sum(dnorm(slopes,slopes_mean,slopes_sd,log=T))
+  log_slope_hier<-sum(dnorm(slope_cell,slope_cellmean,slope_cellsd,log=T))
   
-  return(loglike + log_int_hier + log_slope_hier)
+  return(loglike + log_slope_hier)
 }
 
 #Retrieve MCMC output
 fb.pars.g<-list(
-  ints=c(-10,10,1,0,0,1,158),
-  slopes = c(-10,10,1,0,0,1,158),
-  ints_mean=c(-10,10,2,0,0,1),
-  ints_sd=c(1e-6,10,2,1,0,1),
-  slopes_mean=c(-10,10,2,0,0,1),
-  slopes_sd=c(1e-6,10,2,1,0,1),
+  int=c(-10,10,1,0,0,1),
+  slope_all=c(-10,10,1,0,0,1),
+  slope_cell = c(-10,10,1,0,0,1,158),
+  slope_cellmean=c(-10,10,2,0,0,1),
+  slope_cellsd=c(1e-6,10,2,1,0,1),
   sigma=c(1e-6,10,1,1,0,1)
 )
 
-fb.out.g<-filzbach(150000,150000,g_ll,nrow(gdata60),fb.pars.g)
+fb.out.g<-filzbach(100000,100000,g_ll,nrow(gdata),fb.pars.g)
 
 #Converged (mmm...)?
-g_llvec<-function(x) g_ll(x[1:158],x[159:316],x[317],x[318],x[319],x[320],x[321])
+g_llvec<-function(x) g_ll(x[1],x[2],x[3:160],x[161],x[162],x[163])
 fb.out.g.ll2<-apply(fb.out.g,1,g_llvec)
 plot(fb.out.g.ll2,type="l")
 
 #Calculate goodness of fit
 fb.pm.g<-colMeans(fb.out.g)
-pred<-g_pred((fb.pm.g[1:158])[gdata60$Lon_Lat],(fb.pm.g[159:316])[gdata60$Lon_Lat])
-plot(pred,gdata60$GrowthBest)
+pred<-g_pred(fb.pm.g[1],fb.pm.g[2],(fb.pm.g[3:160])[gdata$Lon_Lat])
+plot(pred,gdata$GrowthBest)
 abline(0,1)
 
 #Calculate credible intervals
 fb.ci.g<-apply(fb.out.g,2,FUN=quantile,probs=c(0.025,0.5,0.975))
 fb.ci.g
-cell.slopes.g<-fb.ci.g[2,159:316]
-tot.slope.g<-fb.ci.g[,319]
+cell.slopes.g<-fb.ci.g[2,3:159]
+tot.slope.g<-fb.ci.g[,2]
 
 ##################
 ##################
 #Make graph panels
 
-plot(gdata60$ModelledBa,gdata60$GrowthBest,pch=NA,log="")
+plot(gdata$ModelledBa,gdata$GrowthBest,pch=NA,log="")
 for (cell in 1:nrow(unique(celllonlat))){
       inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
-      celldata<-gdata60[gdata60$Cell %in% inclcells,]
+      celldata<-gdata[gdata$Cell %in% inclcells,]
     for (pft in unique(celldata$Pft)){
       pftdata<-celldata[celldata$Pft==pft,]
       lines(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,type="l")
@@ -378,13 +384,15 @@ for (cell in 1:nrow(unique(celllonlat))){
 }
 
 #Predicted potential mortality
-data60<-totdata[totdata$Age==6,]
-mdata60<-data60[order(data60$MortBest,data60$Cell,data60$Pft),]
 
-plot(mdata60$ModelledBa,mdata60$MortBest,pch=NA,log="")
+#select age
+data<-totdata2[totdata2$Age==5,]
+mdata<-data[order(data$MortBest,data$Cell,data$Pft),]
+
+plot(mdata$ModelledBa,mdata$MortBest,pch=NA,log="")
 for (cell in 1:nrow(unique(celllonlat))){
   inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
-  celldata<-mdata60[mdata60$Cell %in% inclcells,]
+  celldata<-mdata[mdata$Cell %in% inclcells,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
     lines(pftdata$ModelledBa,pftdata$MortBest,col=pftdata$col,type="l")
@@ -392,13 +400,15 @@ for (cell in 1:nrow(unique(celllonlat))){
 }
 
 #Predicted potential recruitment
-data60<-totdata[totdata$Age==6,]
-rdata60<-data60[order(data60$IngBest,data60$Cell,data60$Pft),]
 
-plot(rdata60$ModelledBa,rdata60$IngBest,pch=NA,log="")
+#select age
+data<-totdata2[totdata2$Age==5,]
+rdata<-data[order(data$IngBest,data$Cell,data$Pft),]
+
+plot(rdata$ModelledBa,rdata$IngBest,pch=NA,log="")
 for (cell in 1:nrow(unique(celllonlat))){
   inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
-  celldata<-rdata60[rdata60$Cell %in% inclcells,]
+  celldata<-rdata[rdata$Cell %in% inclcells,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
     lines(pftdata$ModelledBa,pftdata$IngBest,col=pftdata$col,type="l")
