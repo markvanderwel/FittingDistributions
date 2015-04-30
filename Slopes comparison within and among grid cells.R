@@ -5,15 +5,23 @@
 
 #Add mean ModelledBa
 meanBa<-aggregate(totdata$ModelledBa,list(totdata$Lon_Lat,totdata$Pft),mean)
-names(meanBa)<-c("Lat_Lon","Pft","meanModelledBa")
+names(meanBa)<-c("Lon_Lat","Pft","meanModelledBa")
 
 totdata2<-merge(totdata,meanBa,all.x=T)
 
 ###########################
 #Predicted potential growth
 
+cell.results.g<-c()
+tot.results.g<-c()
+
+x11(6,12)
+par(mfrow=c(6,2),mar=c())
+
+for (pft in unique(totdata2$Pft)){
+
 #select age and Pft
-data<-totdata2[totdata2$Age==5 & totdata2$Pft=="NH",]
+data<-totdata2[totdata2$Age==5 & totdata2$Pft==pft,]
 data$Lon_Lat<-factor(data$Lon_Lat)
 #gdata<-data[order(data$GrowthBest,data$Cell,data$Pft),]
 gdata<-data[order(data$GrowthBest,data$Cell),]
@@ -50,28 +58,29 @@ fb.pars.g<-list(
 
 fb.out.g<-filzbach(200000,200000,g_ll,nrow(gdata),fb.pars.g)
 
-df.fb.out.g<-as.data.frame(fb.out.g)
-
-write.table(df.fb.out.g,"fb.out.g.txt",row.names=F,quote=F,sep="\t")
+#df.fb.out.g<-as.data.frame(fb.out.g)
+#write.table(df.fb.out.g,"fb.out.g.txt",row.names=F,quote=F,sep="\t")
 
 #Converged?
 g_llvec<-function(x) g_ll(x[1],x[2],x[3:160],x[161],x[162],x[163])
 fb.out.g.ll2<-apply(fb.out.g,1,g_llvec)
-plot(fb.out.g.ll2,type="l")
+plot(fb.out.g.ll2,type="l",main=paste(pft))
 
 #Calculate goodness of fit
 fb.pm.g<-colMeans(fb.out.g)
 pred<-g_pred(fb.pm.g[1],fb.pm.g[2],(fb.pm.g[3:160])[gdata$Lon_Lat])
-plot(pred,gdata$GrowthBest)
+plot(pred,gdata$GrowthBest,main=paste(pft))
 abline(0,1)
 
 #Calculate credible intervals
 fb.ci.g<-apply(fb.out.g,2,FUN=quantile,probs=c(0.025,0.5,0.975))
-fb.ci.g
-cell.slopes.g<-fb.ci.g[2,3:159]
-tot.slope.g<-fb.ci.g[,2]
+cell.slopes.g<-c(min(fb.ci.g[2,3:159]),mean(fb.ci.g[2,3:159]),max(fb.ci.g[2,3:159]),
+                 pft,"GrowthBest")
+cell.results.g<-rbind(cell.results.g,cell.slopes.g)
+tot.slope.g<-c(fb.ci.g[,2],pft,"GrowthBest")
+tot.results.g<-rbind(tot.results.g,tot.slope.g)
 
-#Run same model per pft
+}
 
 #####################################################################################
 #####################################################################################
@@ -80,8 +89,16 @@ tot.slope.g<-fb.ci.g[,2]
 
 #Predicted potential mortality
 
-#select age
-data<-totdata2[totdata2$Age==5,]
+cell.results.m<-c()
+tot.results.m<-c()
+
+x11(6,12)
+par(mfrow=c(6,2),mar=c())
+
+for (pft in unique(totdata2$Pft)){
+
+#select age and Pft
+data<-totdata2[totdata2$Age==5 & totdata2$Pft==pft,]
 data$Lon_Lat<-factor(data$Lon_Lat)
 mdata<-data[order(data$MortBest,data$Cell,data$Pft),]
 
@@ -115,38 +132,47 @@ fb.pars.m<-list(
   sigma=c(1e-6,500,1,1,0,1)
 )
 
-fb.out.m<-filzbach(100000,10000,m_ll,nrow(mdata),fb.pars.m)
+fb.out.m<-filzbach(200000,200000,m_ll,nrow(mdata),fb.pars.m)
 
-df.fb.out.m<-as.data.frame(fb.out.m)
-
-write.table(df.fb.out.m,"fb.out.m.txt",row.names=F,quote=F,sep="\t")
+#df.fb.out.m<-as.data.frame(fb.out.m)
+#write.table(df.fb.out.m,"fb.out.m.txt",row.names=F,quote=F,sep="\t")
 
 #Converged?
 m_llvec<-function(x) m_ll(x[1],x[2],x[3:160],x[161],x[162],x[163])
 fb.out.m.ll2<-apply(fb.out.m,1,m_llvec)
-plot(fb.out.m.ll2,type="l")
+plot(fb.out.m.ll2,type="l",main=paste(pft))
 
 #Calculate goodness of fit
 fb.pm.m<-colMeans(fb.out.m)
 pred<-m_pred(fb.pm.m[1],fb.pm.m[2],(fb.pm.m[3:160])[mdata$Lon_Lat])
-plot(pred,mdata$MortBest)
+plot(pred,mdata$MortBest,main=paste(pft))
 abline(0,1)
 
 #Calculate credible intervals
 fb.ci.m<-apply(fb.out.m,2,FUN=quantile,probs=c(0.025,0.5,0.975))
-fb.ci.m
-cell.slopes.m<-fb.ci.m[2,3:159]
-tot.slope.m<-fb.ci.m[,2]
+cell.slopes.m<-c(min(fb.ci.m[2,3:159]),mean(fb.ci.m[2,3:159]),max(fb.ci.m[2,3:159]),
+                 pft,"MortBest")
+cell.results.m<-rbind(cell.results.m,cell.slopes.m)
+tot.slope.m<-c(fb.ci.m[,2],pft,"MortBest")
+tot.results.m<-rbind(tot.results.m,tot.slope.m)
 
-#Run same model per pft
+}
 
 #####################################################################################
 #####################################################################################
 
 #Predicted potential recruitment
 
-#select age
-data<-totdata2[totdata2$Age==5,]
+cell.results.r<-c()
+tot.results.r<-c()
+
+x11(6,12)
+par(mfrow=c(6,2),mar=c())
+
+for (pft in unique(totdata2$Pft)){
+  
+#select age and Pft
+data<-totdata2[totdata2$Age==5 & totdata2$Pft==pft,]
 data$Lon_Lat<-factor(data$Lon_Lat)
 rdata<-data[order(data$IngBest,data$Cell,data$Pft),]
 
@@ -180,27 +206,43 @@ fb.pars.r<-list(
   sigma=c(1e-6,100,1,1,0,1)
 )
 
-fb.out.r<-filzbach(100000,100000,r_ll,nrow(rdata),fb.pars.r)
+fb.out.r<-filzbach(200000,200000,r_ll,nrow(rdata),fb.pars.r)
 
-df.fb.out.r<-as.data.frame(fb.out.r)
-
-write.table(df.fb.out.r,"fb.out.r.txt",row.names=F,quote=F,sep="\t")
+#df.fb.out.r<-as.data.frame(fb.out.r)
+#write.table(df.fb.out.r,"fb.out.r.txt",row.names=F,quote=F,sep="\t")
 
 #Converged?
 r_llvec<-function(x) r_ll(x[1],x[2],x[3:160],x[161],x[162],x[163])
 fb.out.r.ll2<-apply(fb.out.r,1,r_llvec)
-plot(fb.out.r.ll2,type="l")
+plot(fb.out.r.ll2,type="l",main=paste(pft))
 
 #Calculate goodness of fit
 fb.pm.r<-colMeans(fb.out.r)
 pred<-r_pred(fb.pm.r[1],fb.pm.r[2],(fb.pm.r[3:160])[rdata$Lon_Lat])
-plot(pred,rdata$IngBest)
+plot(pred,rdata$IngBest,main=paste(pft))
 abline(0,1)
 
 #Calculate credible intervals
 fb.ci.r<-apply(fb.out.r,2,FUN=quantile,probs=c(0.025,0.5,0.975))
-fb.ci.r
-cell.slopes.r<-fb.ci.r[2,3:159]
-tot.slope.r<-fb.ci.r[,2]
+cell.slopes.r<-c(fb.ci.r[2,3:159],pft,"IngBest")
+cell.slopes.r<-c(min(fb.ci.r[2,3:159]),mean(fb.ci.r[2,3:159]),max(fb.ci.r[2,3:159]),
+                 pft,"IngBest")
+cell.results.r<-rbind(cell.results.r,cell.slopes.r)
+tot.slope.r<-c(fb.ci.r[,2],pft,"IngBest")
+tot.results.r<-rbind(tot.results.r,tot.slope.r)
 
-#Run same model per pft
+}
+
+################################################################################
+################################################################################
+#Combine estimated slopes in dataframe for graphs
+
+cell.results<-as.data.frame(rbind(cell.results.g,cell.results.m,cell.results.r))
+names(cell.results)<-c("min.slope","mean.slope","max.slope","Pft","DemoRate")
+
+write.table(cell.results,"Cell slopes.txt",row.names=F,quote=F,sep="\t")
+
+tot.results<-as.data.frame(rbind(tot.results.g,tot.results.m,tot.results.r))
+names(tot.results)<-c("slope2.5","slope50","slope97.5","Pft","DemoRate")
+
+write.table(tot.results,"Overall slopes.txt",row.names=F,quote=F,sep="\t")
