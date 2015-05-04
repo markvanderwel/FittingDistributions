@@ -3,9 +3,15 @@
 #For now at 50 years.
 #Use "totdata" dataframe from graphs script
 
-#Add mean ModelledBa
-meanBa<-aggregate(totdata$ModelledBa,list(totdata$Lon_Lat,totdata$Pft),mean)
-names(meanBa)<-c("Lon_Lat","Pft","meanModelledBa")
+#Log transform demographic rates
+totdata$GrowthBestLog<-log(totdata$GrowthBest)
+totdata$MortBestLog<-log(totdata$MortBest)
+totdata$IngBestLog<-log(totdata$IngBest)
+
+#Add mean ModelledBa, mean GrowthBest, mean MortBest, mean IngBest
+meanBa<-aggregate(totdata[,c("ModelledBa","GrowthBestLog","MortBestLog","IngBestLog")],
+                  list(totdata$Lon_Lat,totdata$Pft),mean,na.rm=T)
+names(meanBa)<-c("Lon_Lat","Pft","meanModelledBa","meanGrowthBestLog","meanMortBestLog","meanIngBestLog")
 
 totdata2<-merge(totdata,meanBa,all.x=T)
 
@@ -16,15 +22,14 @@ cell.results.g<-c()
 tot.results.g<-c()
 
 x11(6,12)
-par(mfrow=c(6,2),mar=c())
+par(mfrow=c(6,2))
 
 for (pft in unique(totdata2$Pft)){
 
 #select age and Pft
 data<-totdata2[totdata2$Age==5 & totdata2$Pft==pft,]
 data$Lon_Lat<-factor(data$Lon_Lat)
-#gdata<-data[order(data$GrowthBest,data$Cell,data$Pft),]
-gdata<-data[order(data$GrowthBest,data$Cell),]
+gdata<-data[order(data$GrowthBestLog,data$Cell),]
 
 #Estimate overall slope, and slopes per grid cell
 g_pred<-function(int,slope_all,slope_cell){
@@ -38,7 +43,7 @@ g_ll<-function(int,slope_all,slope_cell,slope_cellmean,slope_cellsd,sigma){
   pred<-g_pred(int,slope_all,slope_cell[gdata$Lon_Lat])
   
   #likelihood
-  loglike<-sum(dnorm(gdata$GrowthBest,pred,sigma,log=T))
+  loglike<-sum(dnorm(gdata$GrowthBestLog,pred,sigma,log=T))
   
   #parameter hierarchy
   log_slope_hier<-sum(dnorm(slope_cell,slope_cellmean,slope_cellsd,log=T))
@@ -56,7 +61,7 @@ fb.pars.g<-list(
   sigma=c(1e-6,10,1,1,0,1)
 )
 
-fb.out.g<-filzbach(200000,200000,g_ll,nrow(gdata),fb.pars.g)
+fb.out.g<-filzbach(400000,400000,g_ll,nrow(gdata),fb.pars.g)
 
 #df.fb.out.g<-as.data.frame(fb.out.g)
 #write.table(df.fb.out.g,"fb.out.g.txt",row.names=F,quote=F,sep="\t")
@@ -69,13 +74,14 @@ plot(fb.out.g.ll2,type="l",main=paste(pft))
 #Calculate goodness of fit
 fb.pm.g<-colMeans(fb.out.g)
 pred<-g_pred(fb.pm.g[1],fb.pm.g[2],(fb.pm.g[3:160])[gdata$Lon_Lat])
-plot(pred,gdata$GrowthBest,main=paste(pft))
+plot(pred,gdata$GrowthBestLog,main=paste(pft))
 abline(0,1)
 
 #Calculate credible intervals
 fb.ci.g<-apply(fb.out.g,2,FUN=quantile,probs=c(0.025,0.5,0.975))
 cell.slopes.g<-c(min(fb.ci.g[2,3:159]),mean(fb.ci.g[2,3:159]),max(fb.ci.g[2,3:159]),
                  pft,"GrowthBest")
+#cell.slopes.g<-c(quantile(fb.ci.g[2,3:159],probs=c(0.025,0.5,0.975)),pft,"GrowthBest")
 cell.results.g<-rbind(cell.results.g,cell.slopes.g)
 tot.slope.g<-c(fb.ci.g[,2],pft,"GrowthBest")
 tot.results.g<-rbind(tot.results.g,tot.slope.g)
@@ -93,14 +99,14 @@ cell.results.m<-c()
 tot.results.m<-c()
 
 x11(6,12)
-par(mfrow=c(6,2),mar=c())
+par(mfrow=c(6,2))
 
 for (pft in unique(totdata2$Pft)){
 
 #select age and Pft
 data<-totdata2[totdata2$Age==5 & totdata2$Pft==pft,]
 data$Lon_Lat<-factor(data$Lon_Lat)
-mdata<-data[order(data$MortBest,data$Cell,data$Pft),]
+mdata<-data[order(data$MortBestLog,data$Cell,data$Pft),]
 
 #Estimate overall slope, and slopes per grid cell
 m_pred<-function(int,slope_all,slope_cell){
@@ -114,7 +120,7 @@ m_ll<-function(int,slope_all,slope_cell,slope_cellmean,slope_cellsd,sigma){
   pred<-m_pred(int,slope_all,slope_cell[mdata$Lon_Lat])
   
   #likelihood
-  loglike<-sum(dnorm(mdata$MortBest,pred,sigma,log=T))
+  loglike<-sum(dnorm(mdata$MortBestLog,pred,sigma,log=T))
   
   #parameter hierarchy
   log_slope_hier<-sum(dnorm(slope_cell,slope_cellmean,slope_cellsd,log=T))
@@ -124,15 +130,15 @@ m_ll<-function(int,slope_all,slope_cell,slope_cellmean,slope_cellsd,sigma){
 
 #Retrieve MCMC output
 fb.pars.m<-list(
-  int=c(-500,500,1,0,0,1),
-  slope_all=c(-500,500,1,0,0,1),
-  slope_cell = c(-500,500,1,0,0,1,158),
-  slope_cellmean=c(-500,500,2,0,0,1),
-  slope_cellsd=c(1e-6,500,2,1,0,1),
-  sigma=c(1e-6,500,1,1,0,1)
+  int=c(-10,10,1,0,0,1),
+  slope_all=c(-10,10,1,0,0,1),
+  slope_cell = c(-10,10,1,0,0,1,158),
+  slope_cellmean=c(-10,10,2,0,0,1),
+  slope_cellsd=c(1e-6,10,2,1,0,1),
+  sigma=c(1e-6,10,1,1,0,1)
 )
 
-fb.out.m<-filzbach(200000,200000,m_ll,nrow(mdata),fb.pars.m)
+fb.out.m<-filzbach(400000,400000,m_ll,nrow(mdata),fb.pars.m)
 
 #df.fb.out.m<-as.data.frame(fb.out.m)
 #write.table(df.fb.out.m,"fb.out.m.txt",row.names=F,quote=F,sep="\t")
@@ -145,13 +151,14 @@ plot(fb.out.m.ll2,type="l",main=paste(pft))
 #Calculate goodness of fit
 fb.pm.m<-colMeans(fb.out.m)
 pred<-m_pred(fb.pm.m[1],fb.pm.m[2],(fb.pm.m[3:160])[mdata$Lon_Lat])
-plot(pred,mdata$MortBest,main=paste(pft))
+plot(pred,mdata$MortBestLog,main=paste(pft))
 abline(0,1)
 
 #Calculate credible intervals
 fb.ci.m<-apply(fb.out.m,2,FUN=quantile,probs=c(0.025,0.5,0.975))
 cell.slopes.m<-c(min(fb.ci.m[2,3:159]),mean(fb.ci.m[2,3:159]),max(fb.ci.m[2,3:159]),
                  pft,"MortBest")
+#cell.slopes.m<-c(quantile(fb.ci.m[2,3:159],probs=c(0.025,0.5,0.975)),pft,"MortBest")
 cell.results.m<-rbind(cell.results.m,cell.slopes.m)
 tot.slope.m<-c(fb.ci.m[,2],pft,"MortBest")
 tot.results.m<-rbind(tot.results.m,tot.slope.m)
@@ -174,7 +181,7 @@ for (pft in unique(totdata2$Pft)){
 #select age and Pft
 data<-totdata2[totdata2$Age==5 & totdata2$Pft==pft,]
 data$Lon_Lat<-factor(data$Lon_Lat)
-rdata<-data[order(data$IngBest,data$Cell,data$Pft),]
+rdata<-data[order(data$IngBestLog,data$Cell,data$Pft),]
 
 #Estimate overall slope, and slopes per grid cell
 r_pred<-function(int,slope_all,slope_cell){
@@ -188,7 +195,7 @@ r_ll<-function(int,slope_all,slope_cell,slope_cellmean,slope_cellsd,sigma){
   pred<-r_pred(int,slope_all,slope_cell[rdata$Lon_Lat])
   
   #likelihood
-  loglike<-sum(dnorm(rdata$IngBest,pred,sigma,log=T))
+  loglike<-sum(dnorm(rdata$IngBestLog,pred,sigma,log=T))
   
   #parameter hierarchy
   log_slope_hier<-sum(dnorm(slope_cell,slope_cellmean,slope_cellsd,log=T))
@@ -198,15 +205,15 @@ r_ll<-function(int,slope_all,slope_cell,slope_cellmean,slope_cellsd,sigma){
 
 #Retrieve MCMC output
 fb.pars.r<-list(
-  int=c(-100,100,1,0,0,1),
-  slope_all=c(-100,100,1,0,0,1),
-  slope_cell = c(-100,100,1,0,0,1,158),
-  slope_cellmean=c(-100,100,1,0,0,1),
-  slope_cellsd=c(1e-6,100,1,1,0,1),
-  sigma=c(1e-6,100,1,1,0,1)
+  int=c(-10,10,1,0,0,1),
+  slope_all=c(-10,10,1,0,0,1),
+  slope_cell = c(-10,10,1,0,0,1,158),
+  slope_cellmean=c(-10,10,2,0,0,1),
+  slope_cellsd=c(1e-6,10,2,1,0,1),
+  sigma=c(1e-6,10,1,1,0,1)
 )
 
-fb.out.r<-filzbach(200000,200000,r_ll,nrow(rdata),fb.pars.r)
+fb.out.r<-filzbach(400000,400000,r_ll,nrow(rdata),fb.pars.r)
 
 #df.fb.out.r<-as.data.frame(fb.out.r)
 #write.table(df.fb.out.r,"fb.out.r.txt",row.names=F,quote=F,sep="\t")
@@ -219,14 +226,14 @@ plot(fb.out.r.ll2,type="l",main=paste(pft))
 #Calculate goodness of fit
 fb.pm.r<-colMeans(fb.out.r)
 pred<-r_pred(fb.pm.r[1],fb.pm.r[2],(fb.pm.r[3:160])[rdata$Lon_Lat])
-plot(pred,rdata$IngBest,main=paste(pft))
+plot(pred,rdata$IngBestLog,main=paste(pft))
 abline(0,1)
 
 #Calculate credible intervals
 fb.ci.r<-apply(fb.out.r,2,FUN=quantile,probs=c(0.025,0.5,0.975))
-cell.slopes.r<-c(fb.ci.r[2,3:159],pft,"IngBest")
 cell.slopes.r<-c(min(fb.ci.r[2,3:159]),mean(fb.ci.r[2,3:159]),max(fb.ci.r[2,3:159]),
                  pft,"IngBest")
+#cell.slopes.r<-c(quantile(fb.ci.r[2,3:159],probs=c(0.025,0.5,0.975)),pft,"IngBest")
 cell.results.r<-rbind(cell.results.r,cell.slopes.r)
 tot.slope.r<-c(fb.ci.r[,2],pft,"IngBest")
 tot.results.r<-rbind(tot.results.r,tot.slope.r)

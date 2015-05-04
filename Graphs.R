@@ -7,7 +7,7 @@ library(RColorBrewer)
 library(filzbach)
 
 nc <- nc_open("FittingOutput.nc", readunlim=F)
-#print(nc)
+print(nc)
 
 nc.orig <- nc_open("SimOutWithClimData.nc", readunlim=F)
 
@@ -220,7 +220,8 @@ mtext(expression("Predicted basal area (m"^2*" ha"^-1*")"),
 
 ##############################################################
 #FIGURE: Observed vs. predicted size distribution
-##Compare modelled diameter distributions to FIA data (adjust still...)
+##Compare modelled diameter distributions to FIA data
+##Use same ages as for BA maps
 
 library(ncdf4)
 nc <- nc_open("FittingOutput.nc", readunlim=F)
@@ -264,9 +265,9 @@ modeldbh3[,4] <- apply(modeldbh2,1,FUN=weighted.mean,w=fian2,na.rm=T)
 #layout(matrix(1:4,nrow=2,ncol=2,byrow=T))
 #par(mar=c(3,3,1,1))
 
-x11(6.5,2.5)
+x11(8,3.5)
 #pdf("FIG3.pdf",width=6.5,height=3.5)
-par(mfrow=c(1,4),mar=c(4,4,2,1))
+par(mfrow=c(1,4),mar=c(2,2,2,0.5),oma=c(3,3,0.5,0.5))
 
 binlabs <- c("0-50 y","60-70 y",">80 y","All ages")
 
@@ -281,6 +282,7 @@ for (i in 1:4) {
           lty=1,
           col=c("black","grey"),
           log="y",
+          cex=1.2,
           ylim=c(4e-2,5e3),
           xlim=c(5,95),
           xlab="DBH midpoint (cm)",
@@ -298,6 +300,9 @@ legend("topright",
        bty="n"
 )
 
+mtext("Density (/ha)",side=2, line=1.5, outer=TRUE, adj=0.5, cex=0.8)
+mtext("DBH midpoint (cm)",side=1, line=1.5, outer=TRUE, adj=0.5, cex=0.8)
+
 ############################################################################
 ############################################################################
 #FIGURE: Predicted PFT BA against predicted potential growth, mortality, and
@@ -312,15 +317,15 @@ data$Lon_Lat<-factor(data$Lon_Lat)
 gdata<-data[order(data$GrowthBest,data$Cell,data$Pft),]
 
 x11(width=6.5,height=8)
-par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
+par(mfrow=c(3,2),mar=c(1.5,4.5,1,1),oma=c(3,0,2,0))
 
-plot(gdata$ModelledBa,gdata$GrowthBest,pch=NA,log="")
+plot(gdata$ModelledBa,gdata$GrowthBest,pch=NA,log="y",las=1,cex.axis=1.2)
 for (cell in 1:nrow(unique(celllonlat))){
       inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
       celldata<-gdata[gdata$Cell %in% inclcells,]
     for (pft in unique(celldata$Pft)){
       pftdata<-celldata[celldata$Pft==pft,]
-      lines(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,type="l")
+      points(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,pch=16,cex=1)
    }
 }
 
@@ -332,12 +337,15 @@ y_upper.c<-c(cell.slope[cell.slope$DemoRate=="GrowthBest",]$max.slope)
 y_upper.t<-c(tot.slope[tot.slope$DemoRate=="GrowthBest",]$slope97.5)
 y_lower.c<-c(cell.slope[cell.slope$DemoRate=="GrowthBest",]$min.slope)
 y_lower.t<-c(tot.slope[tot.slope$DemoRate=="GrowthBest",]$slope2.5)
-plot(xvals.t,yvals.t,pch=16,xaxt="n",ylim=c(-0.2,0.3),xlim=c(0.5,6.5),cex=1.4)
+plot(xvals.t,yvals.t,pch=21,col="black",bg="black",xaxt="n",ylim=c(-0.25,0.45),
+     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2)
 abline(0,0,lty=2)
-points(xvals.c,yvals.c,pch=1,cex=1.4)
 arrows(xvals.c,y_lower.c,xvals.c,y_upper.c,code=3,length=0)
 arrows(xvals.t,y_lower.t,xvals.t,y_upper.t,code=3,length=0)
-axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"))
+points(xvals.c,yvals.c,pch=21,cex=1.5,col="black",bg="white")
+axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"),cex.axis=1.2)
+legend("topleft",c("Among grid cells","Within grid cells"),pch=21,
+       pt.bg=c("black","white"),bty="n",pt.cex=1.5,cex=1.3)
 
 #Predicted potential mortality
 
@@ -345,23 +353,29 @@ axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"))
 data<-totdata2[totdata2$Age==5,]
 mdata<-data[order(data$MortBest,data$Cell,data$Pft),]
 
-plot(mdata$ModelledBa,mdata$MortBest,pch=NA,log="")
+plot(mdata$ModelledBa,mdata$MortBest,pch=NA,log="y",las=1,cex.axis=1.2)
 for (cell in 1:nrow(unique(celllonlat))){
   inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
   celldata<-mdata[mdata$Cell %in% inclcells,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
-    lines(pftdata$ModelledBa,pftdata$MortBest,col=pftdata$col,type="l")
+    points(pftdata$ModelledBa,pftdata$MortBest,col=pftdata$col,pch=16,cex=1)
   }
 }
 
-xvals<-c(0.8,1.2,1.8,2.2,2.8,3.2,3.8,4.2,4.8,5.2,5.8,6.2,6.8,7.2)
-yvals<-c(rep(NA,14))
-y_upper<-c(rep(NA,14))
-y_lower<-c(rep(NA,14))
-plot(xvals,yvals,xaxt="n",ylim=c(-0.02,0.2),xlim=c(0.5,6.5))
-arrows(xvals,y_lower,xvals,y_upper,code=3,length=0)
-axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"))
+yvals.c<-c(cell.slope[cell.slope$DemoRate=="MortBest",]$mean.slope)
+yvals.t<-c(tot.slope[tot.slope$DemoRate=="MortBest",]$slope50)
+y_upper.c<-c(cell.slope[cell.slope$DemoRate=="MortBest",]$max.slope)
+y_upper.t<-c(tot.slope[tot.slope$DemoRate=="MortBest",]$slope97.5)
+y_lower.c<-c(cell.slope[cell.slope$DemoRate=="MortBest",]$min.slope)
+y_lower.t<-c(tot.slope[tot.slope$DemoRate=="MortBest",]$slope2.5)
+plot(xvals.t,yvals.t,pch=21,col="black",bg="black",xaxt="n",ylim=c(-0.15,0.6),
+     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2)
+abline(0,0,lty=2)
+arrows(xvals.c,y_lower.c,xvals.c,y_upper.c,code=3,length=0)
+arrows(xvals.t,y_lower.t,xvals.t,y_upper.t,code=3,length=0)
+points(xvals.c,yvals.c,pch=21,cex=1.5,col="black",bg="white")
+axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"),cex.axis=1.2)
 
 #Predicted potential recruitment
 
@@ -369,24 +383,34 @@ axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"))
 data<-totdata2[totdata2$Age==5,]
 rdata<-data[order(data$IngBest,data$Cell,data$Pft),]
 
-plot(rdata$ModelledBa,rdata$IngBest,pch=NA,log="")
+plot(rdata$ModelledBa,rdata$IngBest,pch=NA,log="y",las=1,cex.axis=1.2)
 for (cell in 1:nrow(unique(celllonlat))){
   inclcells <- lonlatclasscell[unique(celllonlat)[cell,1],unique(celllonlat)[cell,2],]
   celldata<-rdata[rdata$Cell %in% inclcells,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
-    lines(pftdata$ModelledBa,pftdata$IngBest,col=pftdata$col,type="l")
+    points(pftdata$ModelledBa,pftdata$IngBest,col=pftdata$col,pch=16,cex=1)
   }
 }
 
-xvals<-c(0.8,1.2,1.8,2.2,2.8,3.2,3.8,4.2,4.8,5.2,5.8,6.2,6.8,7.2)
-yvals<-c(rep(NA,14))
-y_upper<-c(rep(NA,14))
-y_lower<-c(rep(NA,14))
-plot(xvals,yvals,xaxt="n",ylim=c(-0.02,0.2),xlim=c(0.5,6.5))
-arrows(xvals,y_lower,xvals,y_upper,code=3,length=0)
-axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"))
+yvals.c<-c(cell.slope[cell.slope$DemoRate=="IngBest",]$mean.slope)
+yvals.t<-c(tot.slope[tot.slope$DemoRate=="IngBest",]$slope50)
+y_upper.c<-c(cell.slope[cell.slope$DemoRate=="IngBest",]$max.slope)
+y_upper.t<-c(tot.slope[tot.slope$DemoRate=="IngBest",]$slope97.5)
+y_lower.c<-c(cell.slope[cell.slope$DemoRate=="IngBest",]$min.slope)
+y_lower.t<-c(tot.slope[tot.slope$DemoRate=="IngBest",]$slope2.5)
+plot(xvals.t,yvals.t,pch=21,col="black",bg="black",xaxt="n",ylim=c(-1,6),
+     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2)
+abline(0,0,lty=2)
+arrows(xvals.c,y_lower.c,xvals.c,y_upper.c,code=3,length=0)
+arrows(xvals.t,y_lower.t,xvals.t,y_upper.t,code=3,length=0)
+points(xvals.c,yvals.c,pch=21,cex=1.5,col="black",bg="white")
+axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"),cex.axis=1.2)
 
+par(xpd=NA)
+legend(-8.8,25,c("BC","BH","NC","NH","SC","SH"),
+       col=c("darkblue","lightblue","darkgreen","green","darkred","red"),pch=16,ncol=6,bty="n",
+       pt.cex=1,cex=1.4)
 ############################################################################
 ############################################################################
 #FIGURE: Another option for comparing among vs. within grid cell effects.
@@ -410,11 +434,35 @@ totdata2$changeIngBest<-totdata2$IngBest-totdata2$meanIngBest
 x11(6.5,8)
 par(mfrow=c(3,2),mar=c(4,4,1,1))
 plot(totdata2$meanGrowthBest,totdata2$meanModelledBa,col=totdata2$col,pch=16,cex=0.8)
+for (pft in unique(totdata2$Pft)){
+  data<-totdata2[totdata2$Pft==pft,]
+  abline(lm(data$meanModelledBa~data$meanGrowthBest),lwd=2,col=data$col)
+}
 plot(totdata2$changeGrowthBest,totdata2$changeModelledBa,col=totdata2$col,pch=16,cex=0.8)
+for (pft in unique(totdata2$Pft)){
+  data<-totdata2[totdata2$Pft==pft,]
+  abline(lm(data$changeModelledBa~data$changeGrowthBest),lwd=2,col=data$col)
+}
 plot(totdata2$meanMortBest,totdata2$meanModelledBa,col=totdata2$col,pch=16,cex=0.8)
+for (pft in unique(totdata2$Pft)){
+  data<-totdata2[totdata2$Pft==pft,]
+  abline(lm(data$meanModelledBa~data$meanMortBest),lwd=2,col=data$col)
+}
 plot(totdata2$changeMortBest,totdata2$changeModelledBa,col=totdata2$col,pch=16,cex=0.8)
+for (pft in unique(totdata2$Pft)){
+  data<-totdata2[totdata2$Pft==pft,]
+  abline(lm(data$changeModelledBa~data$changeMortBest),lwd=2,col=data$col)
+}
 plot(totdata2$meanIngBest,totdata2$meanModelledBa,col=totdata2$col,pch=16,cex=0.8)
+for (pft in unique(totdata2$Pft)){
+  data<-totdata2[totdata2$Pft==pft,]
+  abline(lm(data$meanModelledBa~data$meanIngBest),lwd=2,col=data$col)
+}
 plot(totdata2$changeIngBest,totdata2$changeModelledBa,col=totdata2$col,pch=16,cex=0.8)
+for (pft in unique(totdata2$Pft)){
+  data<-totdata2[totdata2$Pft==pft,]
+  abline(lm(data$changeModelledBa~data$changeIngBest),lwd=2,col=data$col)
+}
 
 ##############################################################
 #FIGURE: Predicted potential growth, mortality, and
@@ -423,6 +471,8 @@ plot(totdata2$changeIngBest,totdata2$changeModelledBa,col=totdata2$col,pch=16,ce
 
 #cols=brewer.pal(6,"Dark2")
 #cols=c("darkblue","lightblue","darkgreen","green","darkred","red")
+
+pardata$Lon_Lat<-paste(pardata$Lon,pardata$Lat,sep="_")
 
 cols = list(
   BC = "darkblue",
@@ -436,7 +486,7 @@ cols = list(
 cols.light=rgb(t(col2rgb(cols)),alpha=128,maxColorValue=255)
 
 x11(6,6)
-par(mar=c(2,2,0,0))
+par(mar=c(2,3,1,1))
 layout(matrix(1:6,nrow=3,byrow=T))
 
 y.lim = list(
@@ -466,9 +516,8 @@ for (iDemo in demo) {
       
     pardata.sub <- subset(pardata,Demo==iDemo)
     
-    with(pardata.sub,plot(Temp,exp(LogValue),main=paste("\n",iDemo,sep=" "),pch=NA,ylim=y.lim[[iDemo]],xlab="",ylab="",log="y"))
-    #with(pardata.sub,plot(Temp,(Prior),col=col.range.fade(which(iSp==species[-1]),Temp),main=paste("\n",iSp,iDemo,sep=" "),ylim=y.lim[[iDemo]],xlab="",ylab="",log="y"))
-    #with(pardata.sub,points(Temp,exp(LogValue),col=rgb(0,0,0,0.3),main=paste("Post",iDemo,sep=" ")))  
+    with(pardata.sub,plot(Temp,exp(LogValue),main=paste("\n",iDemo,sep=" "),pch=NA,
+                          ylim=y.lim[[iDemo]],xlab="",ylab="",log="y"))
           
     for (iSp in species[-1]) {
        
@@ -477,14 +526,10 @@ for (iDemo in demo) {
       col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","lightblue",ifelse(iSp=="NC","darkgreen",
                                     ifelse(iSp=="NH","green",ifelse(iSp=="SC","darkred","red")))))
       
-      indlatlon <- unique(pardata.sub.Sp[,3:4])
-      pardata.sub.Sp$Index <- mapply(FUN=function(x1,x2) 
-      {which(x1==indlatlon[,1] & x2==indlatlon[,2])},
-      pardata.sub.Sp$Lat,
-      pardata.sub.Sp$Lon)
-    
+      #Construct dataframe with values per grid cell (mean, median, max), include predictions,
+      #and min&max precip&temp from pardata.sub
       pd.horz <- data.frame(
-        Index = unique(pardata.sub.Sp$Index),
+        Lon_Lat = pardata.sub.Sp$Lon_Lat),
         LogValueMin = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=min),
         LogValueMed = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=median),
         LogValueMax = tapply(pardata.sub.Sp$LogValue,pardata.sub.Sp$Index,FUN=max),
@@ -492,9 +537,6 @@ for (iDemo in demo) {
         Precip = tapply(pardata.sub.Sp$Precip,pardata.sub.Sp$Index,FUN=mean),
         Pft = iSp
       )
-    
-      #class.cols = c("red","darkgreen","blue")
-      #correct for pft range (min(x.lim.Temp[[iSp]]),max(x.lim.Temp[[iSp]]))
     
       for (iClass in 1:3) {
         p <- exp(predict(loess(pd.horz[,iClass+1] ~ pd.horz$Temp)))          
@@ -550,80 +592,42 @@ for (iDemo in demo) {
 #Total BA may be best?
 #Use same age classes, or just ages, as for size distributions.
 
-cols<-colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000)
-states=c("Minn","Wisc","Iowa","Ill","Indian","Missou","Arkan","Mississ","Kentu","Tenn","Alaba",
-         "Flor","Georg","South Car","North Car","Virgini","West Vir","Ohio","Penns","Maryl",
-         "Delaw","New Jer","New Yo","Connect","Rhod","Massach","Vermo","New Ham","Main","Michi")
-
-#Calculate mean observed and predicted BA per grid cell and stand age
-sumBA<-aggregate(totdata[,c("FiaBa","ModelledBa")], 
-                 list(totdata$Cell,totdata$Age,totdata$Lon,totdata$Lat,totdata$PlotClass),mean,na.rm=T)
-names(sumBA)<-c("Cell","Age","Lon","Lat","PlotClass","FiaBa","ModelledBa")
-
-meanBA<-aggregate(totdata[,c("FiaBa","ModelledBa")], 
-                 list(totdata$Cell,totdata$Age,totdata$Lon,totdata$Lat),mean,na.rm=T)
-names(meanBA)<-c("Cell","Age","Lon","Lat","meanFiaBa","meanModelledBa")
-
-##DOES NOT WORK YET
-
-par(mfrow=c(8,2),mar=c(0,0,0,0),oma=c(5,6,0.1,0.1))
-
-for(time in c(5)){
-  data <- meanBA[meanBA$Age==time,c("Lon","Lat","meanFiaBa")]
-  names(data)<-c("x","y","z")
-  data$z[data$z>20]<-20
+panel.fiaba <- function(time) {
   
-  m<-list(x=data$x,y=data$y,z=data$z)
-  
-  #problem: also y needs to be in ascending order...
-  image(m$x,m$y,m$z,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",
-        xlab="",ylab="",bty="n",asp=1.2)
-  map(database="state",regions=states,interior=F,add=T)
-  
-}
-
-#####################################################################################
-#####################################################################################
-#old for BA maps: ADJUSTED
-make.frame2 <- function(time) {
-  
-  layout(matrix(c(1,2,3),nrow=3,byrow=T),heights=c(1,1,0.3))
-  par(mar=c(0,0,0,0))
-  
-  iPft <- 5
-  
-  x <- fiaba[iPft,time,2,,] #middle plot class only
+  iPft<-5
+  x <- fiaba[iPft,time,mean(0:2),,] #average of plot classes
+  #x <- fiaba[sum(2:7),time,mean(0:2),,] #sum of Pft's, 0:5, and 1:6 do also not work.
   x[nplots[time,2,,]<10] <- NA
   x[x>20] <- 20
   image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
   map(database="state",regions=states,interior=F,add=T)
   
-  x <- ba.orig[time*2,iPft,1,,]
+}
+
+panel.modelledba <- function(time) {
+  
+  iPft<-5
+  x <- modelledba[time,iPft,mean(0:2),,]
   x[x>20] <- 20
   image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
   map(database="state",regions=states,interior=F,add=T)
-  
-  
-  plot(NULL,NULL,xlim=0:1,ylim=0:1,xlab="",ylab="",bty="n",xaxt="n",yaxt="n")
-  text(0.25,0.5, label=paste("Year",Time[time]*10,sep=" "), cex=2.5, adj=0)
-  
+
 }
 
-x11(1.6667,4)
-make.frame2(8)
+x11(6,11)
+par(mfrow=c(4,2),mar=c(0,0,0,0),oma=c(0,5,3,0))
+panel.fiaba(1)
+panel.modelledba(1)
+panel.fiaba(3)
+panel.modelledba(3)
+panel.fiaba(5)
+panel.modelledba(5)
+panel.fiaba(8)
+panel.modelledba(8)
 
-#####
-
-#df.fiaba[i] <- fiaba[s,t,c,iLon,iLat]
-#df.modelledba[i] <- modelledba[t,s,c,iLon,iLat]
-
-x <- fiaba[,5,,,]
-x[nplots[5,,,]<10] <- NA
-x2 <- apply(x,2,FUN=sum,na.rm=T)
-x3 <- apply(x,3,FUN=mean,na.rm=T)
-x3[x3>20] <- 20
-image(lon,lat,x3,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
-map(database="state",regions=states,interior=F,add=T)
-
-
-
+mtext("Observed (FIA)",side=3, line=1.5, outer=TRUE, adj=0.1, cex=1.2)
+mtext("Predicted (CAIN)",side=3, line=1.5, outer=TRUE, adj=0.85, cex=1.2)
+mtext("10 y",side=1, line=-62, outer=TRUE, adj=-0.15, cex=1.2)
+mtext("30 y",side=1, line=-44, outer=TRUE, adj=-0.15, cex=1.2)
+mtext("50 y",side=1, line=-28, outer=TRUE, adj=-0.15, cex=1.2)
+mtext("80 y",side=1, line=-10, outer=TRUE, adj=-0.15, cex=1.2)
