@@ -550,13 +550,14 @@ states=c("Minn","Wisc","Iowa","Ill","Indian","Missou","Arkan","Mississ","Kentu",
          "Flor","Georg","South Car","North Car","Virgini","West Vir","Ohio","Penns","Maryl",
          "Delaw","New Jer","New Yo","Connect","Rhod","Massach","Vermo","New Ham","Main","Michi")
 
-#averaging over plot classes + discarding cells with too few plots not correct still!!
 
 panel.fiaba <- function(time,iPft) {
   
-  x <- fiaba[iPft,time,2,,] #not correct, looks at one plot class only...
+  #x <- fiaba[iPft,time,2,,] #not correct, looks at one plot class only...
+  x <- apply(fiaba[iPft,time,,,],c(2,3),FUN=mean) #MCV
   #x <- fiaba[iPft,time,mean(0:2),,] #average of plot classes
-  x[nplots[time,2,,]<5] <- NA  #not correct, one plot class only...
+  #x[nplots[time,2,,]<5] <- NA  #not correct, one plot class only...
+  x[apply(nplots[time,,,],c(2,3),FUN=sum)<5] <- NA #MCV
   x[x>20] <- 20
   image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
   map(database="state",regions=states,interior=F,add=T)
@@ -566,7 +567,8 @@ panel.fiaba <- function(time,iPft) {
 panel.modelledba <- function(time,iPft) {
   
   #x <- modelledba[time,iPft,mean(0:2),,]
-  x <- modelledba[time,iPft,2,,]
+  #x <- modelledba[time,iPft,2,,]
+  x <- apply(modelledba[time,iPft,,,],c(2,3),FUN=mean) #MCV
   x[x>20] <- 20
   image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
   map(database="state",regions=states,interior=F,add=T)
