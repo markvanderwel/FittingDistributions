@@ -169,7 +169,8 @@ totdata$Lat_Lon<-paste(totdata$Lat,totdata$Lon,sep="_")
 #FIGURE: Goodness of fit: observed vs predicted PFT basal area
 #Now per functional type.
 
-x11(6.5,8)
+#x11(6.5,8)
+pdf("Figure goodness of fit.pdf",width=6.5,height=8)
 par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
 
 plot(totdata$ModelledBa[totdata$Pft=="BC"],totdata$FiaBa[totdata$Pft=="BC"],
@@ -208,6 +209,8 @@ mtext(expression("Observed basal area (m"^2*" ha"^-1*")"),
       side=2, line=2, outer=TRUE, adj=0.5, cex=1)
 mtext(expression("Predicted basal area (m"^2*" ha"^-1*")"),
       side=1, line=2.5, outer=TRUE, adj=0.5, cex=1)
+
+dev.off()
 
 ##############################################################
 #FIGURE: Observed vs. predicted size distribution
@@ -255,7 +258,8 @@ modeldbh3[,4] <- apply(modeldbh2,1,FUN=weighted.mean,w=fian2,na.rm=T)
 #x11(15,15)
 #layout(matrix(1:4,nrow=2,ncol=2,byrow=T))
 
-x11(8,3.5)
+#x11(8,3.5)
+pdf("Figure size distributions.pdf",width=8,height=3.5)
 par(mfrow=c(1,4),mar=c(2,2,2,0.5),oma=c(3,3,0.5,0.5))
 
 binlabs <- c("0-50 y","60-70 y",">80 y","All ages")
@@ -292,6 +296,8 @@ legend("topright",
 mtext("Density (/ha)",side=2, line=1.5, outer=TRUE, adj=0.5, cex=0.8)
 mtext("DBH midpoint (cm)",side=1, line=1.5, outer=TRUE, adj=0.5, cex=0.8)
 
+dev.off()
+
 ############################################################################
 ############################################################################
 #FIGURE: Predicted PFT BA against predicted potential growth, mortality, and
@@ -305,17 +311,18 @@ data<-totdata[totdata$Age==5,]
 data$Lat_Lon<-factor(data$Lat_Lon)
 gdata<-data
 
-x11(width=6.5,height=8)
+#x11(width=6.5,height=8)
+pdf("Figure slopes.pdf",width=6.5,height=8)
 par(mfrow=c(3,2),mar=c(1.5,4.5,1,1),oma=c(3,0,2,0))
 
-plot(gdata$ModelledBa,gdata$GrowthBest,pch=NA,las=1,cex.axis=1.2)
+plot(gdata$ModelledBa,gdata$GrowthBest,pch=NA,las=1,cex.axis=1.2,ylab="Growth",cex.lab=1.2)
 for (cell in unique(gdata$Lat_Lon)){
       celldata<-gdata[gdata$Lat_Lon==cell,]
     for (pft in unique(celldata$Pft)){
       pftdata<-celldata[celldata$Pft==pft,]
       pftdata<-pftdata[order(pftdata$ModelledBa),]
       points(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,pch=21,cex=1.1)
-      lines(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,lwd=2)
+      lines(pftdata$ModelledBa,pftdata$GrowthBest,col=pftdata$col,lwd=1)
    }
 }
 
@@ -328,7 +335,7 @@ y_upper.t<-c(tot.slope[tot.slope$DemoRate=="GrowthBest",]$slope97.5)
 y_lower.c<-c(cell.slope[cell.slope$DemoRate=="GrowthBest",]$min.slope)
 y_lower.t<-c(tot.slope[tot.slope$DemoRate=="GrowthBest",]$slope2.5)
 plot(xvals.t,yvals.t,pch=21,col="black",bg="black",xaxt="n",ylim=c(-0.1,0.3),
-     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2)
+     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2,ylab="Slope",cex.lab=1.2)
 abline(0,0,lty=2)
 arrows(xvals.c,y_lower.c,xvals.c,y_upper.c,code=3,length=0)
 arrows(xvals.t,y_lower.t,xvals.t,y_upper.t,code=3,length=0)
@@ -340,17 +347,17 @@ legend("topleft",c("Among grid cells","Within grid cells"),pch=21,
 #Predicted potential mortality
 
 #select age
-data<-totdata2[totdata2$Age==5,]
+data<-totdata[totdata$Age==5,]
 mdata<-data
 
-plot(mdata$ModelledBa,mdata$MortBest,pch=NA,las=1,cex.axis=1.2)
+plot(mdata$ModelledBa,mdata$MortBest,pch=NA,las=1,cex.axis=1.2,ylab="Mortality",cex.lab=1.2)
 for (cell in unique(mdata$Lat_Lon)){
   celldata<-mdata[mdata$Lat_Lon==cell,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
     pftdata<-pftdata[order(pftdata$ModelledBa),]
     points(pftdata$ModelledBa,pftdata$MortBest,col=pftdata$col,pch=21,cex=1.1)
-    lines(pftdata$ModelledBa,pftdata$MortBest,col=pftdata$col,lwd=2)
+    lines(pftdata$ModelledBa,pftdata$MortBest,col=pftdata$col,lwd=1)
   }
 }
 
@@ -361,7 +368,7 @@ y_upper.t<-c(tot.slope[tot.slope$DemoRate=="MortBest",]$slope97.5)
 y_lower.c<-c(cell.slope[cell.slope$DemoRate=="MortBest",]$min.slope)
 y_lower.t<-c(tot.slope[tot.slope$DemoRate=="MortBest",]$slope2.5)
 plot(xvals.t,yvals.t,pch=21,col="black",bg="black",xaxt="n",ylim=c(-30,60),
-     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2)
+     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2,ylab="Slope",cex.lab=1.2)
 abline(0,0,lty=2)
 arrows(xvals.c,y_lower.c,xvals.c,y_upper.c,code=3,length=0)
 arrows(xvals.t,y_lower.t,xvals.t,y_upper.t,code=3,length=0)
@@ -371,17 +378,17 @@ axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"),cex.axis=1.
 #Predicted potential recruitment
 
 #select age
-data<-totdata2[totdata2$Age==5,]
+data<-totdata[totdata$Age==5,]
 rdata<-data
 
-plot(rdata$ModelledBa,rdata$IngBest,pch=NA,las=1,cex.axis=1.2)
+plot(rdata$ModelledBa,rdata$IngBest,pch=NA,las=1,cex.axis=1.2,ylab="Recruitment",cex.lab=1.2)
 for (cell in unique(rdata$Lat_Lon)){
   celldata<-rdata[rdata$Lat_Lon==cell,]
   for (pft in unique(celldata$Pft)){
     pftdata<-celldata[celldata$Pft==pft,]
     pftdata<-pftdata[order(pftdata$ModelledBa),]
     points(pftdata$ModelledBa,pftdata$IngBest,col=pftdata$col,pch=21,cex=1.1)
-    lines(pftdata$ModelledBa,pftdata$IngBest,col=pftdata$col,lwd=2)
+    lines(pftdata$ModelledBa,pftdata$IngBest,col=pftdata$col,lwd=1)
   }
 }
 
@@ -392,7 +399,7 @@ y_upper.t<-c(tot.slope[tot.slope$DemoRate=="IngBest",]$slope97.5)
 y_lower.c<-c(cell.slope[cell.slope$DemoRate=="IngBest",]$min.slope)
 y_lower.t<-c(tot.slope[tot.slope$DemoRate=="IngBest",]$slope2.5)
 plot(xvals.t,yvals.t,pch=21,col="black",bg="black",xaxt="n",ylim=c(-30,80),
-     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2)
+     xlim=c(0.5,6.5),las=1,cex=1.5,cex.axis=1.2,ylab="Slope",cex.lab=1.2)
 abline(0,0,lty=2)
 arrows(xvals.c,y_lower.c,xvals.c,y_upper.c,code=3,length=0)
 arrows(xvals.t,y_lower.t,xvals.t,y_upper.t,code=3,length=0)
@@ -402,7 +409,9 @@ axis(side=1,at=c(1:6),tick=T,labels=c("BC","BH","NC","NH","SC","SH"),cex.axis=1.
 par(xpd=NA)
 legend(-8.8,380,c("BC","BH","NC","NH","SC","SH"),
        col=c("darkblue","skyblue2","darkgreen","lightgreen","darkred","red"),
-       pch=c(21,21,21,21,21,21),ncol=6,bty="n",pt.bg="white",pt.cex=1.2,cex=1.4,lty=1,lwd=2)
+       pch=c(21,21,21,21,21,21),ncol=6,bty="n",pt.bg="white",pt.cex=1.2,cex=1.4,lty=1,lwd=1)
+
+dev.off()
 
 ##############################################################
 #FIGURE: Predicted potential growth, mortality, and
@@ -411,7 +420,8 @@ legend(-8.8,380,c("BC","BH","NC","NH","SC","SH"),
 
 pardata$Lat_Lon<-paste(pardata$Lat,pardata$Lon,sep="_")
 
-x11(6.5,6.5)
+#x11(6.5,6.5)
+pdf("Figure demography-climate.pdf",width=6.5,height=6.5)
 par(mar=c(0.5,0.5,0.5,0.5),oma=c(4,5.5,1.75,0.5))
 layout(matrix(1:6,nrow=3,byrow=T))
 
@@ -477,9 +487,11 @@ for (iDemo in demo) {
  
         #add lines
         pd.horz2<-pd.horz2[order(pd.horz2$Temp),]
-        lines(pd.horz2$Temp,pd.horz2$PredMin,col=col.light,lwd=2)
+        #lines(pd.horz2$Temp,pd.horz2$PredMin,col=col.light,lwd=2)
+        lines(pd.horz2$Temp,pd.horz2$PredMin,col=col,lwd=2,lty=2)
         lines(pd.horz2$Temp,pd.horz2$PredMed,col=col,lwd=2)
-        lines(pd.horz2$Temp,pd.horz2$PredMax,col=col.light,lwd=2)
+        #lines(pd.horz2$Temp,pd.horz2$PredMax,col=col.light,lwd=2)
+        lines(pd.horz2$Temp,pd.horz2$PredMax,col=col,lwd=2,lty=2)
         
   }
   
@@ -520,9 +532,11 @@ for (iDemo in demo) {
     
     #add lines
     pd.horz2<-pd.horz2[order(pd.horz2$Precip),]
-    lines(pd.horz2$Precip,pd.horz2$PredMin,col=col.light,lwd=2)
+    #lines(pd.horz2$Precip,pd.horz2$PredMin,col=col.light,lwd=2)
+    lines(pd.horz2$Precip,pd.horz2$PredMin,col=col,lwd=2,lty=2)
     lines(pd.horz2$Precip,pd.horz2$PredMed,col=col,lwd=2)
-    lines(pd.horz2$Precip,pd.horz2$PredMax,col=col.light,lwd=2)
+    #lines(pd.horz2$Precip,pd.horz2$PredMax,col=col.light,lwd=2)
+    lines(pd.horz2$Precip,pd.horz2$PredMax,col=col,lwd=2,lty=2)
     
   }
 }
@@ -539,6 +553,8 @@ mtext("Mean annual precipitation (mm)", side=1, line=2.5,
       outer=TRUE, adj=0.9, cex=1)
 mtext(expression(paste("Mean annual temperature (",degree,"C)")), 
       side=1, line=2.75, outer=TRUE, adj=0.1, cex=1)
+
+dev.off()
 
 ################################################
 #FIGURE: Observed vs. predicted BA per stand age
