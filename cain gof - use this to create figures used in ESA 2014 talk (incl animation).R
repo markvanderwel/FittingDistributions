@@ -295,7 +295,8 @@ make.frame <- function(time,model) {
 }
 
 x11(10,4)
-make.frame(8,"orig")
+for (i in 1:10) make.frame(i,"best")
+
 
 saveGIF({for (i in 1:10) make.frame(i,"orig")}, movie.name="orig_ba.gif")
 saveGIF({for (i in 1:10) make.frame(i,"best")}, movie.name="best_ba.gif")
