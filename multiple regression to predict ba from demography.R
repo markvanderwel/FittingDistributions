@@ -1,5 +1,5 @@
 
-#run code from Graphs.R to generate totdata
+#run code from Graphs.R up to about L156 to generate totdata
 
 totdata$Ba2 <- totdata$ModelledBa
 totdata$G2 <- totdata$GrowthModelled
@@ -38,20 +38,20 @@ for (iPft in unique(totdata$Pft)) {
 #   totdata$StdLogM2[totdata$Pft == iPft] <- (totdata$LogM2[totdata$Pft == iPft])
 #   totdata$StdLogR2[totdata$Pft == iPft] <- (totdata$LogR2[totdata$Pft == iPft])
 #   totdata$StdAge2[totdata$Pft == iPft] <- (totdata$Age2[totdata$Pft == iPft])
-  
-  
-  
+    
 }
 
+CM.StdLogBa2 <- aggregate(totdata$StdLogBa2,by=list(totdata$Lon,totdata$Lat,totdata$Pft),FUN=mean,na.rm=T)
+CM.StdLogG2 <- aggregate(totdata$StdLogG2,by=list(totdata$Lon,totdata$Lat,totdata$Pft),FUN=mean,na.rm=T)
+CM.StdLogM2 <- aggregate(totdata$StdLogM2,by=list(totdata$Lon,totdata$Lat,totdata$Pft),FUN=mean,na.rm=T)
+CM.StdLogR2 <- aggregate(totdata$StdLogR2,by=list(totdata$Lon,totdata$Lat,totdata$Pft),FUN=mean,na.rm=T)
 
-CM.StdLogG2 <- aggregate(totdata$StdLogG2,by=list(totdata$Lon,totdata$Lat),FUN=mean,na.rm=T)
-CM.StdLogM2 <- aggregate(totdata$StdLogM2,by=list(totdata$Lon,totdata$Lat),FUN=mean,na.rm=T)
-CM.StdLogR2 <- aggregate(totdata$StdLogR2,by=list(totdata$Lon,totdata$Lat),FUN=mean,na.rm=T)
+totdata$StdLogBa2.CM <- CM.StdLogBa2$x[match(paste(totdata$Lon,totdata$Lat,totdata$Pft),paste(CM.StdLogG2[,1],CM.StdLogG2[,2],CM.StdLogG2[,3]))]
+totdata$StdLogG2.CM <- CM.StdLogG2$x[match(paste(totdata$Lon,totdata$Lat,totdata$Pft),paste(CM.StdLogG2[,1],CM.StdLogG2[,2],CM.StdLogG2[,3]))]
+totdata$StdLogM2.CM <- CM.StdLogM2$x[match(paste(totdata$Lon,totdata$Lat,totdata$Pft),paste(CM.StdLogG2[,1],CM.StdLogG2[,2],CM.StdLogG2[,3]))]
+totdata$StdLogR2.CM <- CM.StdLogR2$x[match(paste(totdata$Lon,totdata$Lat,totdata$Pft),paste(CM.StdLogG2[,1],CM.StdLogG2[,2],CM.StdLogG2[,3]))]
 
-totdata$StdLogG2.CM <- CM.StdLogG2$x[match(paste(totdata$Lon,totdata$Lat),paste(CM.StdLogG2[,1],CM.StdLogG2[,2]))]
-totdata$StdLogM2.CM <- CM.StdLogM2$x[match(paste(totdata$Lon,totdata$Lat),paste(CM.StdLogG2[,1],CM.StdLogG2[,2]))]
-totdata$StdLogR2.CM <- CM.StdLogR2$x[match(paste(totdata$Lon,totdata$Lat),paste(CM.StdLogG2[,1],CM.StdLogG2[,2]))]
-
+totdata$StdLogBa2.Res <- totdata$StdLogBa2 - totdata$StdLogBa2.CM
 totdata$StdLogG2.Res <- totdata$StdLogG2 - totdata$StdLogG2.CM
 totdata$StdLogM2.Res <- totdata$StdLogM2 - totdata$StdLogM2.CM
 totdata$StdLogR2.Res <- totdata$StdLogR2 - totdata$StdLogR2.CM
@@ -69,3 +69,40 @@ for (iPft in unique(totdata$Pft)) {
 colnames(save.coef) <- names(lm.mod$coefficients)
 save.coef
 barplot(t(save.coef[,-1]),beside=T,col=c("red","red","green","green","blue","blue","yellow"))
+
+#among-cell plots
+layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
+for (iPft in unique(totdata$Pft)) {
+  with(subset(totdata,Pft==iPft),plot(StdLogG2.CM,StdLogBa2.CM,xlim=c(-2,2)))
+  title(main=iPft)
+}
+layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
+for (iPft in unique(totdata$Pft)) {
+  with(subset(totdata,Pft==iPft),plot(StdLogM2.CM,StdLogBa2.CM,xlim=c(-2,2)))
+  title(main=iPft)
+}
+layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
+for (iPft in unique(totdata$Pft)) {
+  with(subset(totdata,Pft==iPft),plot(StdLogR2.CM,StdLogBa2.CM,xlim=c(-2,2)))
+  title(main=iPft)
+}
+#within-cell plots
+layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
+for (iPft in unique(totdata$Pft)) {
+  with(subset(totdata,Pft==iPft),plot(StdLogG2.Res,StdLogBa2.Res,xlim=c(-2,2)))
+  title(main=iPft)
+}
+layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
+for (iPft in unique(totdata$Pft)) {
+  with(subset(totdata,Pft==iPft),plot(StdLogM2.Res,StdLogBa2.Res,xlim=c(-2,2)))
+  title(main=iPft)
+}
+layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
+for (iPft in unique(totdata$Pft)) {
+  with(subset(totdata,Pft==iPft),plot(StdLogR2.Res,StdLogBa2.Res,xlim=c(-2,2)))
+  title(main=iPft)
+}
+
+
+
+layout(1)
