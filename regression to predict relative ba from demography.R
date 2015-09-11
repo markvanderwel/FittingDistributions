@@ -101,13 +101,5 @@ for (iPft in unique(totdata$Pft)) {
 
 ##########
 
-layout(1)
-plot(sM,lBa)
-points(sM,alogit(predict(lm(logit(lBa)~sM))),col="red")
-points(sM,predict(loess(lBa~sM)),col="green")
-
-
-
-plot(sM,logit(lBa))
-points(sM,predict(lm(logit(lBa)~sM)),col="red")
-points(sM,predict(loess(logit(lBa)~sM)),col="green")
+#plot successional changes for average demographic parameters
+matplot(t(alogit(save.coef[,1]+outer(save.coef[,5],2:8))),type="b")
