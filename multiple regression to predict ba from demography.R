@@ -1,5 +1,9 @@
 
+#THIS ANALYSIS NO LONGER USED
+
+
 #run code from Graphs.R up to about L156 to generate totdata
+
 
 totdata$Ba2 <- totdata$ModelledBa
 totdata$G2 <- totdata$GrowthModelled
@@ -32,12 +36,12 @@ for (iPft in unique(totdata$Pft)) {
   totdata$StdLogR2[totdata$Pft == iPft] <- scale(totdata$LogR2[totdata$Pft == iPft])
   totdata$StdAge2[totdata$Pft == iPft] <- scale(totdata$Age2[totdata$Pft == iPft])
 
-#   #no scaling
-#   totdata$StdLogBa2[totdata$Pft == iPft] <- (totdata$LogBa2[totdata$Pft == iPft])
-#   totdata$StdLogG2[totdata$Pft == iPft] <- (totdata$LogG2[totdata$Pft == iPft])
-#   totdata$StdLogM2[totdata$Pft == iPft] <- (totdata$LogM2[totdata$Pft == iPft])
-#   totdata$StdLogR2[totdata$Pft == iPft] <- (totdata$LogR2[totdata$Pft == iPft])
-#   totdata$StdAge2[totdata$Pft == iPft] <- (totdata$Age2[totdata$Pft == iPft])
+  #no scaling
+  totdata$StdLogBa2[totdata$Pft == iPft] <- (totdata$LogBa2[totdata$Pft == iPft])
+  totdata$StdLogG2[totdata$Pft == iPft] <- (totdata$LogG2[totdata$Pft == iPft])
+  totdata$StdLogM2[totdata$Pft == iPft] <- (totdata$LogM2[totdata$Pft == iPft])
+  totdata$StdLogR2[totdata$Pft == iPft] <- (totdata$LogR2[totdata$Pft == iPft])
+  totdata$StdAge2[totdata$Pft == iPft] <- (totdata$Age2[totdata$Pft == iPft])
     
 }
 
@@ -73,17 +77,17 @@ barplot(t(save.coef[,-1]),beside=T,col=c("red","red","green","green","blue","blu
 #among-cell plots
 layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
 for (iPft in unique(totdata$Pft)) {
-  with(subset(totdata,Pft==iPft),plot(StdLogG2.CM,StdLogBa2.CM,xlim=c(-2,2)))
+  with(subset(totdata,Pft==iPft),plot(StdLogG2.CM,StdLogBa2.CM))
   title(main=iPft)
 }
 layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
 for (iPft in unique(totdata$Pft)) {
-  with(subset(totdata,Pft==iPft),plot(StdLogM2.CM,StdLogBa2.CM,xlim=c(-2,2)))
+  with(subset(totdata,Pft==iPft),plot(StdLogM2.CM,StdLogBa2.CM))
   title(main=iPft)
 }
 layout(matrix(1:6,nrow=2,ncol=3,byrow=T))
 for (iPft in unique(totdata$Pft)) {
-  with(subset(totdata,Pft==iPft),plot(StdLogR2.CM,StdLogBa2.CM,xlim=c(-2,2)))
+  with(subset(totdata,Pft==iPft),plot(StdLogR2.CM,StdLogBa2.CM))
   title(main=iPft)
 }
 #within-cell plots
@@ -103,6 +107,7 @@ for (iPft in unique(totdata$Pft)) {
   title(main=iPft)
 }
 
-
-
 layout(1)
+
+#correlations
+with(subset(totdata,Pft==iPft),cor(cbind(StdLogBa2,StdLogG2.CM,StdLogM2.CM,StdLogR2.CM,StdLogG2.Res,StdLogM2.Res,StdLogR2.Res,StdAge2),use="compl"))
