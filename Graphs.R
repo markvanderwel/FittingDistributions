@@ -102,9 +102,11 @@ for (iLon in 1:31) {
     for (c in 1:3) {  #plotclass
       
       if (!is.na(lonlatclasscell[iLon,iLat,c])) {    
-        for (t in 1:16) {    
+        #for (t in 1:16) {    
+        for (t in c(2,4,6,8)) {
     
-          if (nplots[t,c,iLon,iLat] > 9) {         
+          #if (nplots[t,c,iLon,iLat] > 9) {         
+          if (T) {
             for (s in 2:7) {      
               
               i <- i + 1
@@ -213,7 +215,7 @@ mtext(expression("Predicted basal area (m"^2*" ha"^-1*")"),
 dev.off()
 
 ##############################################################
-#FIGURE: Observed vs. predicted size distribution
+##FIGURE: Observed vs. predicted size distribution
 ##Compare modelled diameter distributions to FIA data
 ##Use same ages as for BA maps?
 
@@ -559,32 +561,34 @@ dev.off()
 ################################################
 #FIGURE: Observed vs. predicted BA per stand age
 #Total BA may be best?
-#Use same age classes, or just ages, as for size distributions.
 
+#Test: Look at dataset
+count<-aggregate(totdata$PlotClass,list(totdata$Lat_Lon),function(x) length(unique(na.omit(x))))
+names(count)<-c("Lat_Lon","count.PlotClass")
+count2<-aggregate(totdata$Age,list(totdata$Lat_Lon,totdata$PlotClass),function(x) length(unique(na.omit(x))))
+names(count2)<-c("Lat_Lon","PlotClass","count.Age")
+iPft<-3
+time<-2
+
+#
 cols<-colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000)
 states=c("Minn","Wisc","Iowa","Ill","Indian","Missou","Arkan","Mississ","Kentu","Tenn","Alaba",
          "Flor","Georg","South Car","North Car","Virgini","West Vir","Ohio","Penns","Maryl",
          "Delaw","New Jer","New Yo","Connect","Rhod","Massach","Vermo","New Ham","Main","Michi")
 
-
-panel.fiaba <- function(time,iPft) {
+panel.fiaba <- function(iPft) {
   
-  #x <- fiaba[iPft,time,2,,] #not correct, looks at one plot class only...
-  x <- apply(fiaba[iPft,time,,,],c(2,3),FUN=mean) #MCV
-  #x <- fiaba[iPft,time,mean(0:2),,] #average of plot classes
-  #x[nplots[time,2,,]<5] <- NA  #not correct, one plot class only...
-  x[apply(nplots[time,,,],c(2,3),FUN=sum)<5] <- NA #MCV
+  x <- apply(fiaba[iPft,,,,]*nplots,c(3,4),FUN=sum)/apply(nplots,c(3,4),FUN=sum)
+  x[apply(nplots,c(3,4),FUN=sum)<5] <- NA
   x[x>20] <- 20
   image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
   map(database="state",regions=states,interior=F,add=T)
   
 }
 
-panel.modelledba <- function(time,iPft) {
-  
-  #x <- modelledba[time,iPft,mean(0:2),,]
-  #x <- modelledba[time,iPft,2,,]
-  x <- apply(modelledba[time,iPft,,,],c(2,3),FUN=mean) #MCV
+panel.modelledba <- function(iPft) {
+
+  x <- apply(modelledba[,iPft,,,]*nplots,c(3,4),FUN=sum)/apply(nplots,c(3,4),FUN=sum)
   x[x>20] <- 20
   image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
   map(database="state",regions=states,interior=F,add=T)
@@ -592,22 +596,33 @@ panel.modelledba <- function(time,iPft) {
 }
 
 x11(6.5,4.5)
-par(mfrow=c(3,4),mar=c(0,0,0,0),oma=c(0,4,3,0))
-panel.fiaba(2,5)
-panel.modelledba(2,5)
-panel.fiaba(6,5)
-panel.modelledba(6,5)
-panel.fiaba(2,6)
-panel.modelledba(2,6)
-panel.fiaba(6,6)
-panel.modelledba(6,6)
-panel.fiaba(2,7)
-panel.modelledba(2,7)
-panel.fiaba(6,7)
-panel.modelledba(6,7)
+layout(matrix(1:5,1:5,1:5),5,3,widths=c(1.5,1.5,0.5,1.5,1.5))
+par(mar=c(0,0,0,0),oma=c(0,4,3,0))
 
-mtext("20 years",side=3, line=1.5, outer=TRUE, adj=0.2, cex=1.2)
-mtext("60 years",side=3, line=1.5, outer=TRUE, adj=0.77, cex=1.2)
+layout(matrix(1:14,nrow=2,byrow=F))
+for (iPft in 1:7) {
+  panel.fiaba(iPft)
+  panel.modelledba(iPft)
+}
+
+panel.fiaba(3)
+panel.modelledba(3)
+plot.new()
+panel.fiaba(4)
+panel.modelledba(4)
+panel.fiaba(2)
+panel.modelledba(2)
+plot.new()
+panel.fiaba(7)
+panel.modelledba(7)
+panel.fiaba(5)
+panel.modelledba(5)
+plot.new()
+panel.fiaba(6)
+panel.modelledba(6)
+
+#mtext("20 years",side=3, line=1.5, outer=TRUE, adj=0.2, cex=1.2)
+#mtext("60 years",side=3, line=1.5, outer=TRUE, adj=0.77, cex=1.2)
 mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
 mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.35, cex=1)
 mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.63, cex=1)
@@ -615,9 +630,16 @@ mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.9, cex=1)
 mtext("NH",side=1, line=-28, outer=TRUE, adj=-0.07, cex=1.2)
 mtext("SC",side=1, line=-17, outer=TRUE, adj=-0.07, cex=1.2)
 mtext("SH",side=1, line=-7, outer=TRUE, adj=-0.07, cex=1.2)
+mtext("NH",side=1, line=-28, outer=TRUE, adj=-0.07, cex=1.2)
+mtext("SC",side=1, line=-17, outer=TRUE, adj=-0.07, cex=1.2)
+mtext("SH",side=1, line=-7, outer=TRUE, adj=-0.07, cex=1.2)
 
 ############################################################################
 ############################################################################
+############################################################################
+############################################################################
+#PREVIOUS VERSIONS OF FIGURES
+
 #OLD FIGURE: Another option for comparing among vs. within grid cell effects.
 #Grid cell mean BA against grid cell mean demographic rate per PFT
 #Second series of panels, plot class BA - mean BA, vs. 
@@ -669,3 +691,63 @@ for (pft in unique(totdata2$Pft)){
   data<-totdata2[totdata2$Pft==pft,]
   abline(lm(data$changeModelledBa~data$changeIngBest),lwd=2,col=data$col)
 }
+
+################################################
+#OLD VERSION OF FIGURE: Observed vs. predicted BA per stand age
+#Total BA may be best?
+#Use same age classes, or just ages, as for size distributions.
+
+cols<-colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000)
+states=c("Minn","Wisc","Iowa","Ill","Indian","Missou","Arkan","Mississ","Kentu","Tenn","Alaba",
+         "Flor","Georg","South Car","North Car","Virgini","West Vir","Ohio","Penns","Maryl",
+         "Delaw","New Jer","New Yo","Connect","Rhod","Massach","Vermo","New Ham","Main","Michi")
+
+
+panel.fiaba <- function(time,iPft) {
+  
+  #x <- fiaba[iPft,time,2,,] #not correct, looks at one plot class only...
+  x <- apply(fiaba[iPft,time,,,],c(2,3),FUN=mean) #MCV
+  #x <- fiaba[iPft,time,mean(0:2),,] #average of plot classes
+  #x[nplots[time,2,,]<5] <- NA  #not correct, one plot class only...
+  x[apply(nplots[time,,,],c(2,3),FUN=sum)<5] <- NA #MCV
+  x[x>20] <- 20
+  image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
+  map(database="state",regions=states,interior=F,add=T)
+  
+}
+
+panel.modelledba <- function(time,iPft) {
+  
+  #x <- modelledba[time,iPft,mean(0:2),,]
+  #x <- modelledba[time,iPft,2,,]
+  x <- apply(modelledba[time,iPft,,,],c(2,3),FUN=mean) #MCV
+  x[x>20] <- 20
+  image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
+  map(database="state",regions=states,interior=F,add=T)
+  
+}
+
+x11(6.5,4.5)
+par(mfrow=c(3,4),mar=c(0,0,0,0),oma=c(0,4,3,0))
+panel.fiaba(2,5)
+panel.modelledba(2,5)
+panel.fiaba(6,5)
+panel.modelledba(6,5)
+panel.fiaba(2,6)
+panel.modelledba(2,6)
+panel.fiaba(6,6)
+panel.modelledba(6,6)
+panel.fiaba(2,7)
+panel.modelledba(2,7)
+panel.fiaba(6,7)
+panel.modelledba(6,7)
+
+mtext("20 years",side=3, line=1.5, outer=TRUE, adj=0.2, cex=1.2)
+mtext("60 years",side=3, line=1.5, outer=TRUE, adj=0.77, cex=1.2)
+mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
+mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.35, cex=1)
+mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.63, cex=1)
+mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.9, cex=1)
+mtext("NH",side=1, line=-28, outer=TRUE, adj=-0.07, cex=1.2)
+mtext("SC",side=1, line=-17, outer=TRUE, adj=-0.07, cex=1.2)
+mtext("SH",side=1, line=-7, outer=TRUE, adj=-0.07, cex=1.2)
