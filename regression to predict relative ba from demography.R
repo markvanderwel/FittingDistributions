@@ -24,7 +24,8 @@ max2.G2 <- aggregate(totdata$G2[totdata$G2 < totdata$maxG2],by=list(totdata$Cell
 totdata$max2G2 <- max2.G2$x[match(totdata$Cell,max2.G2[,1])]
 
 #calculate PFT growth relative to the maximum, or if it is the maximum, then second highest growth
-totdata$relG2 <- totdata$G2/ifelse(totdata$G2==totdata$maxG2,totdata$max2G2,totdata$maxG2)
+#totdata$relG2 <- totdata$G2/ifelse(totdata$G2==totdata$maxG2,totdata$max2G2,totdata$maxG2)
+totdata$relG2 <- totdata$G2/totdata$maxG2
 
 #repeat for mortality now
 max.M2 <- aggregate(totdata$M2,by=list(totdata$Cell),FUN=max,na.rm=T)
@@ -32,7 +33,8 @@ totdata$maxM2 <- max.M2$x[match(totdata$Cell,max.M2[,1])]
 max2.M2 <- aggregate(totdata$M2[totdata$M2 < totdata$maxM2],by=list(totdata$Cell[totdata$M2 < totdata$maxM2]),FUN=max,na.rm=T)
 totdata$max2M2 <- max2.M2$x[match(totdata$Cell,max2.M2[,1])]
 
-totdata$relM2 <- totdata$M2/ifelse(totdata$M2==totdata$maxM2,totdata$max2M2,totdata$maxM2)
+#totdata$relM2 <- totdata$M2/ifelse(totdata$M2==totdata$maxM2,totdata$max2M2,totdata$maxM2)
+totdata$relM2 <- totdata$M2/totdata$maxM2
 
 
 #repeat for recruitment now
@@ -41,7 +43,8 @@ totdata$maxR2 <- max.R2$x[match(totdata$Cell,max.R2[,1])]
 max2.R2 <- aggregate(totdata$R2[totdata$R2 < totdata$maxR2],by=list(totdata$Cell[totdata$R2 < totdata$maxR2]),FUN=max,na.rm=T)
 totdata$max2R2 <- max2.R2$x[match(totdata$Cell,max2.R2[,1])]
 
-totdata$relR2 <- totdata$R2/ifelse(totdata$R2==totdata$maxR2,totdata$max2R2,totdata$maxR2)
+#totdata$relR2 <- totdata$R2/ifelse(totdata$R2==totdata$maxR2,totdata$max2R2,totdata$maxR2)
+totdata$relR2 <- totdata$R2/totdata$maxR2
 
 logit <- function(x) log(x/(1-x))
 alogit <- function(x) 1/(1+exp(-x))
@@ -100,6 +103,6 @@ for (iPft in unique(totdata$Pft)) {
 }
 
 ##########
-
+layout(1)
 #plot successional changes for average demographic parameters
 matplot(t(alogit(save.coef[,1]+outer(save.coef[,5],2:8))),type="b")
