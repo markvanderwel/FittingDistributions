@@ -536,7 +536,7 @@ par(mfrow=c(1,2),mar=c(4,4.5,2,0.5))
 
 spp<-c("BC","BH","NC","NH","SH")
 
-plot(n.data$Age,n.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,22),xlab="Age (y)",
+plot(n.data$Age,n.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,25),xlab="Age (y)",
      ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1)
 for (iSp in spp){
   col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
@@ -547,14 +547,15 @@ for (iSp in spp){
   data2$Age<-as.numeric(data2$Age)
   data2<-data2[order(data2$Pft,data2$Age),]
 
-  lines(data2$Age,data2$meanFiaBa,col=col,lty=5,lwd=2)
-  lines(data2$Age,data2$meanModelledBa,col=col,lwd=2)
+  lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
+  lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
 
 }
+text(2.25,24,"Northern US")
 
 spp2<-c("NH","SC","SH")
 
-plot(s.data$Age,s.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,22),xlab="Age (y)",
+plot(s.data$Age,s.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,25),xlab="Age (y)",
      ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1)
 for (iSp in spp2){
   col = ifelse(iSp=="SC","darkred",ifelse(iSp=="NH","lightgreen","red"))
@@ -564,13 +565,14 @@ for (iSp in spp2){
   data2$Age<-as.numeric(data2$Age)
   data2<-data2[order(data2$Pft,data2$Age),]
     
-  lines(data2$Age,data2$meanFiaBa,col=col,lty=5,lwd=2)
-  lines(data2$Age,data2$meanModelledBa,col=col,lwd=2)
+  lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
+  lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
   
 }
+text(2.25,24,"Southern US")
 
 par(xpd=NA)
-legend(-17,27,c("BC","BH","NC","NH","SC","SH"),
+legend(-17,31,c("BC","BH","NC","NH","SC","SH"),
        col=c("darkblue","skyblue2","darkgreen","lightgreen","darkred","red"),ncol=6,bty="n",
        lty=1,lwd=2,cex=1)
 
