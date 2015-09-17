@@ -166,7 +166,7 @@ totdata <- data.frame(Cell=df.cell,Age=df.age,Lon=df.lon,Lat=df.lat,PlotClass=df
 
 #Add unique code for cell and for region (north vs. south)
 totdata$Lat_Lon<-paste(totdata$Lat,totdata$Lon,sep="_")
-totdata$region<-ifelse(totdata$Lat<37,"south","north")
+totdata$region<-ifelse(totdata$Lat<36,"south",ifelse(totdata$Lat<44,"mid","north"))
 
 ##############################################################
 #FIGURE: Goodness of fit: observed vs predicted PFT basal area
@@ -465,13 +465,26 @@ panel.modelledba <- function(iPft) {
 
 }
 
-#x11(6.5,4.5)
-pdf("Figure obs vs pred BA maps.pdf",width=6.5,height=4.5)
-#m<-rbind(1:5,6:10,11:15,c(16,16,17,18,18))
-#layout(m,widths=rep(c(1.5,1.5,0.5,1.5,1.5),4))
-m<-rbind(1:5,6:10,11:15)
-layout(m,widths=rep(c(1.5,1.5,0.5,1.5,1.5),3))
-par(mar=c(0,0,0,0),oma=c(0,4,3,0))
+#Function for plotting legend
+color.bar <- function(cols, min, max, nticks=5, ticks=seq(min, max, len=nticks)) {
+  scale = (length(cols)-1)/(max-min)
+  
+  plot(c(min,max), c(0,1), type="n", bty="n", xaxt="n", xlab=expression("Basal area (m"^2*" ha"^-1*")"), 
+       yaxt="n", ylab="",ylim=c(0,1))
+  axis(1, ticks, las=1)
+  for (i in 1:(length(cols)-1)) {
+    x = (i-1)/scale + min
+    rect(x,0,x+1/scale,0.75, col=cols[i], border=NA)
+  }
+}
+
+#x11(6.5,7.5)
+pdf("Figure obs vs pred BA maps.pdf",width=6.5,height=7.5)
+m<-rbind(c(1,2,2,3,3,4,4,5),c(6,7,7,8,8,9,9,10),c(11,12,12,13,13,14,14,15),
+         c(16,16,16,17,17,18,18,18),c(19,19,20,20,20,20,21,21))
+layout(m,widths=c(rep(c(1.4,0.6,0.8,0.2,0.2,0.8,0.6,1.4),5)),
+       heights=c(1.5,1.5,1.5,0.5,2.5))
+par(mar=c(0,0,0,0),oma=c(4,4,1.5,0))
 
 panel.fiaba(2)
 panel.modelledba(2)
@@ -489,34 +502,22 @@ plot(1,type="n",axes=F,xlab="",ylab="")
 panel.fiaba(7)
 panel.modelledba(7)
 
-mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
-mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.32, cex=1)
-mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.66, cex=1)
-mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.93, cex=1)
-mtext("BC",side=1, line=-28, outer=TRUE, adj=-0.07, cex=1.2)
-mtext("NC",side=1, line=-17, outer=TRUE, adj=-0.07, cex=1.2)
-mtext("SC",side=1, line=-7, outer=TRUE, adj=-0.07, cex=1.2)
-mtext("BH",side=1, line=-28, outer=TRUE, adj=0.48, cex=1.2)
-mtext("NH",side=1, line=-17, outer=TRUE, adj=0.48, cex=1.2)
-mtext("SH",side=1, line=-7, outer=TRUE, adj=0.48, cex=1.2)
-
-dev.off()
-
-##TO ADJUST
-# Function to plot color bar
-color.bar <- function(cols, min, max, nticks=11, ticks=seq(min, max, len=nticks)) {
-  scale = (length(cols)-1)/(max-min)
-  
-  #dev.new(width=1.75, height=5)
-  plot(c(0,10), c(min,max), type='n', bty='n', xaxt='n', xlab='', yaxt='n', ylab='')
-  axis(2, ticks, las=1)
-  for (i in 1:(length(cols)-1)) {
-    y = (i-1)/scale + min
-    rect(0,y,1,y+1/scale, col=cols[i], border=NA)
-  }
-}
-
+##Add legend
+par(mar=c(2,0.5,0,0.5))
 color.bar(colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000), 0, 20)
+plot(1,type="n",axes=F,xlab="",ylab="")
+color.bar(colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000), 0, 20)
+
+#mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
+#mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.32, cex=1)
+#mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.66, cex=1)
+#mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.93, cex=1)
+#mtext("BC",side=1, line=-28, outer=TRUE, adj=-0.07, cex=1.2)
+#mtext("NC",side=1, line=-17, outer=TRUE, adj=-0.07, cex=1.2)
+#mtext("SC",side=1, line=-7, outer=TRUE, adj=-0.07, cex=1.2)
+#mtext("BH",side=1, line=-28, outer=TRUE, adj=0.48, cex=1.2)
+#mtext("NH",side=1, line=-17, outer=TRUE, adj=0.48, cex=1.2)
+#mtext("SH",side=1, line=-7, outer=TRUE, adj=0.48, cex=1.2)
 
 ##PANEL B
 ##Based on totdata: calculate weighted average per plot age.
@@ -528,13 +529,13 @@ names(avgdata)<-c("region","Age","Pft","meanModelledBa","meanFiaBa")
 
 avgdata2<-avgdata[avgdata$Age<11,]
 n.data<-avgdata2[avgdata2$region=="north",]
+m.data<-avgdata2[avgdata2$region=="mid",]
 s.data<-avgdata2[avgdata2$region=="south",]
 
-#x11(6.5,3.5)
-#pdf("Figure BA-age trajectories.pdf",width=6.5,height=3.5)
-par(mfrow=c(1,2),mar=c(4,4.5,2,0.5))
+##Add in panels with BA-age trajectories
+par(mar=c(0.5,0.5,3.5,0.5))
 
-spp<-c("BC","BH","NC","NH","SH")
+spp<-c("BC","BH","NC","NH")
 
 plot(n.data$Age,n.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,25),xlab="Age (y)",
      ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1)
@@ -551,12 +552,33 @@ for (iSp in spp){
   lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
 
 }
-text(2.25,24,"Northern US")
+text(2.25,24,"Latitude >44")
+
+spp1<-c("BC","BH","NC","NH","SH")
+
+plot(m.data$Age,m.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,25),xlab="Age (y)",
+     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,yaxt="n")
+axis(side=2,at=seq(0,25,5),tick=T,labels=F)
+for (iSp in spp1){
+  col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
+                                                                       ifelse(iSp=="NH","lightgreen","red"))))
+  
+  data<-m.data[m.data$Pft==iSp,]
+  data2<-rbind(data,c("mid",0,iSp,0,0))
+  data2$Age<-as.numeric(data2$Age)
+  data2<-data2[order(data2$Pft,data2$Age),]
+  
+  lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
+  lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
+  
+}
+text(2.25,24,"Latitude 36-44")
 
 spp2<-c("NH","SC","SH")
 
 plot(s.data$Age,s.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,25),xlab="Age (y)",
-     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1)
+     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,yaxt="n")
+axis(side=2,at=seq(0,25,5),tick=T,labels=F)
 for (iSp in spp2){
   col = ifelse(iSp=="SC","darkred",ifelse(iSp=="NH","lightgreen","red"))
   
@@ -569,12 +591,27 @@ for (iSp in spp2){
   lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
   
 }
-text(2.25,24,"Southern US")
+text(2.25,24,"Latitude <36")
 
 par(xpd=NA)
-legend(-17,31,c("BC","BH","NC","NH","SC","SH"),
+legend(-24,31,c("BC","BH","NC","NH","SC","SH"),
        col=c("darkblue","skyblue2","darkgreen","lightgreen","darkred","red"),ncol=6,bty="n",
        lty=1,lwd=2,cex=1)
+
+mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
+mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.32, cex=1)
+mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.66, cex=1)
+mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.93, cex=1)
+mtext("BC",side=1, line=-47, outer=TRUE, adj=-0.07, cex=1.2)
+mtext("NC",side=1, line=-37, outer=TRUE, adj=-0.07, cex=1.2)
+mtext("SC",side=1, line=-27, outer=TRUE, adj=-0.07, cex=1.2)
+mtext("BH",side=1, line=-47, outer=TRUE, adj=0.48, cex=1.2)
+mtext("NH",side=1, line=-37, outer=TRUE, adj=0.48, cex=1.2)
+mtext("SH",side=1, line=-27, outer=TRUE, adj=0.48, cex=1.2)
+mtext(expression("Basal area (m"^2*" ha"^-1*")"),side=2,line=32.5,adj=0.99,cex=0.9)
+mtext("Age (y)",side=1,line=2.5,adj=-0.95,cex=0.9)
+mtext("(a)",side=1, line=-52, outer=TRUE, adj=-0.08, cex=1.4)
+mtext("(b)",side=1, line=-15.5, outer=TRUE, adj=-0.08, cex=1.4)
 
 dev.off()
 
