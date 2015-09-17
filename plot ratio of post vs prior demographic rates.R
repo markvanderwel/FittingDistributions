@@ -48,5 +48,5 @@ plot(as.numeric(mean.ratios),ylim=c(0,2.5),ylab="Ratio",xlab="",xaxt="n")
 arrows(1:18,as.numeric(mean.ratios+sd.ratios),
        y1=as.numeric(mean.ratios-sd.ratios),angle=90,length=0.1,code=3)
 abline(1,0,lty=2)
-abline(v=c(6.5,12.5),lty=2)
+abline(v=c(6.5,12.5),lty=1)
 text(c(3.5,9.5,15.5),0.2,labels=c("Growth","Longevity","Recruitment"),adj=0.5)
