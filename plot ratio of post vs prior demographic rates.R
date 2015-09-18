@@ -50,3 +50,20 @@ arrows(1:18,as.numeric(mean.ratios+sd.ratios),
 abline(1,0,lty=2)
 abline(v=c(6.5,12.5),lty=1)
 text(c(3.5,9.5,15.5),0.2,labels=c("Growth","Longevity","Recruitment"),adj=0.5)
+
+x11(6.5,3)
+#pdf("Figure ratio posterior and prior demographic rates.pdf",width=6.5,height=3)
+par(mar=c(2.5,4,1.5,0.5))
+plot(as.numeric(mean.ratios),ylim=c(0.5,2.5),ylab="Ratio posterior/prior",xlab="",xaxt="n",
+     cex.axis=0.8,las=1,pch=NA)
+axis(side=1,at=c(1:18),tick=T,labels=rep(row.names(mean.ratios),3),cex.axis=0.78)
+arrows(1:18,as.numeric(mean.ratios+sd.ratios),
+       y1=as.numeric(mean.ratios-sd.ratios),angle=90,length=0)
+abline(1,0,lty=2)
+abline(v=c(6.5,12.5),lty=1)
+points(as.numeric(mean.ratios),pch=21,bg="white",cex=1.3)
+
+par(xpd=NA)
+text(c(3.5,9.5,15.5),2.75,labels=c("Growth","Longevity","Recruitment"),adj=0.5)
+
+dev.off()
