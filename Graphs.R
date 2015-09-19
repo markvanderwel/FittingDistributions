@@ -478,8 +478,8 @@ color.bar <- function(cols, min, max, nticks=5, ticks=seq(min, max, len=nticks))
   }
 }
 
-#x11(6.5,7.5)
-pdf("Figure obs vs pred BA maps.pdf",width=6.5,height=7.5)
+x11(6.5,7.5)
+#pdf("Figure obs vs pred BA maps.pdf",width=6.5,height=7.5)
 m<-rbind(c(1,2,2,3,3,4,4,5),c(6,7,7,8,8,9,9,10),c(11,12,12,13,13,14,14,15),
          c(16,16,16,17,17,18,18,18),c(19,19,20,20,20,20,21,21))
 layout(m,widths=c(rep(c(1.4,0.6,0.8,0.2,0.2,0.8,0.6,1.4),5)),
@@ -522,6 +522,36 @@ color.bar(colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange
 ##PANEL B
 ##Based on totdata: calculate weighted average per plot age.
 
+#create data by region
+regions <- ifelse(lat>44,"North",ifelse(lat<36,"South","Mid"))
+ba[ba==-999] <- NA
+
+#create arrays to hold results
+pred.traj <- array(dim=c(3,dim(ba)[1],length(species[-1])))
+dimnames(pred.traj) <- list(c("North","Mid","South"),NULL,species[-1])
+obs.traj <- pred.traj
+
+#fill arrays
+for (iRegion in c("North","Mid","South")) {
+  for (iTime in 1:dim(pred.traj)[2]) {
+    for (iPft in species[-1]) {
+      pred.traj[iRegion,iTime,iPft] <- weighted.mean(
+        ba[iTime,species==iPft,,,regions==iRegion],
+        nplots[iTime,,,regions==iRegion],
+        na.rm=T)
+      obs.traj[iRegion,iTime,iPft] <- weighted.mean(
+        fiaba[species==iPft,iTime,,,regions==iRegion],
+        nplots[iTime,,,regions==iRegion],
+        na.rm=T)
+    }
+  }
+}
+#replace NaNs with NA, and set age=0 to 0
+pred.traj[is.nan(pred.traj)] <- NA
+obs.traj[is.nan(obs.traj)] <- NA
+pred.traj[,1,] <- 0
+obs.traj[,1,] <- 0
+
 #Calculate means per region, age and functional type
 avgdata<-aggregate(totdata[,c("ModelledBa","FiaBa")],
                     list(totdata$region,totdata$Age,totdata$Pft),mean,na.rm=T)
@@ -537,7 +567,7 @@ par(mar=c(0.5,0.5,3.5,0.5))
 
 spp<-c("BC","BH","NC","NH")
 
-plot(n.data$Age,n.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,25),xlab="Age (y)",
+plot(n.data$Age,n.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,20),xlab="Age (y)",
      ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1)
 for (iSp in spp){
   col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
@@ -548,15 +578,17 @@ for (iSp in spp){
   data2$Age<-as.numeric(data2$Age)
   data2<-data2[order(data2$Pft,data2$Age),]
 
-  lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
-  lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
-
+  #lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
+  #lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
+  lines(0:10,obs.traj["North",1:11,match(iSp,species[-1])],col=col,lwd=2)
+  lines(0:10,pred.traj["North",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
+  
 }
 text(2.25,24,"Latitude >44")
 
 spp1<-c("BC","BH","NC","NH","SH")
 
-plot(m.data$Age,m.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,25),xlab="Age (y)",
+plot(m.data$Age,m.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,20),xlab="Age (y)",
      ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,yaxt="n")
 axis(side=2,at=seq(0,25,5),tick=T,labels=F)
 for (iSp in spp1){
@@ -568,15 +600,17 @@ for (iSp in spp1){
   data2$Age<-as.numeric(data2$Age)
   data2<-data2[order(data2$Pft,data2$Age),]
   
-  lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
-  lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
+  #lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
+  #lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
+  lines(0:10,obs.traj["Mid",1:11,match(iSp,species[-1])],col=col,lwd=2)
+  lines(0:10,pred.traj["Mid",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
   
 }
 text(2.25,24,"Latitude 36-44")
 
 spp2<-c("NH","SC","SH")
 
-plot(s.data$Age,s.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,25),xlab="Age (y)",
+plot(s.data$Age,s.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,20),xlab="Age (y)",
      ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,yaxt="n")
 axis(side=2,at=seq(0,25,5),tick=T,labels=F)
 for (iSp in spp2){
@@ -587,8 +621,10 @@ for (iSp in spp2){
   data2$Age<-as.numeric(data2$Age)
   data2<-data2[order(data2$Pft,data2$Age),]
     
-  lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
-  lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
+  #lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
+  #lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
+  lines(0:10,obs.traj["South",1:11,match(iSp,species[-1])],col=col,lwd=2)
+  lines(0:10,pred.traj["South",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
   
 }
 text(2.25,24,"Latitude <36")
