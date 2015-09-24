@@ -199,15 +199,15 @@ lines(x,t(alogit(save.coef["BH",1]+outer(save.coef["BH",5],x)+outer(save.coef["B
 lines(x,t(alogit(save.coef["NC",1]+outer(save.coef["NC",5],x)+outer(save.coef["NC",6],x^2))),
       type="b",pch=16, col="darkgreen")
 lines(x,t(alogit(save.coef["NH",1]+outer(save.coef["NH",5],x)+outer(save.coef["NH",6],x^2))),
-      type="b",pch=16, col="lightgreen")
+      type="b",pch=16, col="green3")
 lines(x,t(alogit(save.coef["SC",1]+outer(save.coef["SC",5],x)+outer(save.coef["SC",6],x^2))),
-      type="b",pch=16, col="darkred")
+      type="b",pch=16, col="red2")
 lines(x,t(alogit(save.coef["SH",1]+outer(save.coef["SH",5],x)+outer(save.coef["SH",6],x^2))),
-      type="b",pch=16, col="red")
+      type="b",pch=16, col="pink2")
 
 par(xpd=NA)
 legend(0.9,0.495,c("BC","BH","NC","NH","SC","SH"),
-       col=c("darkblue","skyblue2","darkgreen","lightgreen","darkred","red"),ncol=3,bty="n",
+       col=c("darkblue","skyblue2","darkgreen","green3","red2","pink2"),ncol=3,bty="n",
        pch=16,cex=0.9,pt.cex=1,lty=5)
 
 mtext("Mean relative basal area", side=2, line=2, outer=TRUE, adj=0.45, cex=1)

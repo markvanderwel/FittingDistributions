@@ -177,36 +177,36 @@ pdf("Figure goodness of fit.pdf",width=6.5,height=8)
 par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
 
 plot(totdata$ModelledBa[totdata$Pft=="BC"],totdata$FiaBa[totdata$Pft=="BC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col="grey60",pch=16,cex=1.4,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(2,28,"BC",cex=1.4)
+text(1.5,29,"BC",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="BH"],totdata$FiaBa[totdata$Pft=="BH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col="grey60",pch=16,cex=1.4,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 axis(side=2,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(2,28,"BH",cex=1.4)
+text(1.5,29,"BH",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="NC"],totdata$FiaBa[totdata$Pft=="NC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col="grey60",pch=16,cex=1.4,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(2,28,"NC",cex=1.4)
+text(1.5,29,"NC",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="NH"],totdata$FiaBa[totdata$Pft=="NH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col="grey60",pch=16,cex=1.4,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 axis(side=2,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(2,28,"NH",cex=1.4)
+text(1.5,29,"NH",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="SC"],totdata$FiaBa[totdata$Pft=="SC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,col="grey60",pch=16,cex=1.4,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
 abline(0,1,lwd=2,lty=2)
-text(2,28,"SC",cex=1.4)
+text(1.5,29,"SC",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="SH"],totdata$FiaBa[totdata$Pft=="SH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,yaxt="n",col="grey60",pch=16,cex=1.4,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,yaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(2,28,"SH",cex=1.4)
+text(1.5,29,"SH",cex=1.4)
 
 mtext(expression("Observed basal area (m"^2*" ha"^-1*")"),
       side=2, line=2, outer=TRUE, adj=0.5, cex=1)
@@ -299,8 +299,6 @@ dev.off()
 #recruitment (incl upper and lower bounds against climate)
 #RUN "kriging testing 2" script to generate predictions ("pardata")
 
-pardata$Lat_Lon<-paste(pardata$Lat,pardata$Lon,sep="_")
-
 #x11(6.5,6.5)
 pdf("Figure demography-climate.pdf",width=6.5,height=6.5)
 par(mar=c(0.5,0.5,0.5,0.5),oma=c(4,5.5,1.75,0.5))
@@ -321,8 +319,6 @@ x.lim.Temp = list(
   SH = c(6,22)
 )
 
-#This is a guess, what values should be included?
-#1 and 99 percentiles result in different values for temperature?
 x.lim.Precip = list(
   BC = c(45,118),
   BH = c(44,115),
@@ -347,7 +343,7 @@ for (iDemo in demo) {
       pardata.sub.Sp <- subset(pardata.sub, Pft==iSp)
       
       col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
-                                    ifelse(iSp=="NH","lightgreen",ifelse(iSp=="SC","darkred","red")))))
+                                    ifelse(iSp=="NH","green3",ifelse(iSp=="SC","red2","pink2")))))
       col.light=rgb(t(col2rgb(col)),alpha=128,maxColorValue=255)
                   
         pd.horz <- data.frame(
@@ -392,7 +388,7 @@ for (iDemo in demo) {
     pardata.sub.Sp <- subset(pardata.sub, Pft==iSp)
     
     col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
-                                                ifelse(iSp=="NH","lightgreen",ifelse(iSp=="SC","darkred","red")))))
+                                                ifelse(iSp=="NH","green3",ifelse(iSp=="SC","red2","pink2")))))
     col.light=rgb(t(col2rgb(col)),alpha=128,maxColorValue=255)
     
     pd.horz <- data.frame(
@@ -424,7 +420,7 @@ for (iDemo in demo) {
 
 par(xpd=NA)
 legend(-75,exp(27),c("BC","BH","NC","NH","SC","SH"),
-       col=c("darkblue","skyblue2","darkgreen","lightgreen","darkred","red"),ncol=6,bty="n",
+       col=c("darkblue","skyblue2","darkgreen","green3","red2","pink2"),ncol=6,bty="n",
        lty=1,lwd=2,cex=1.4)
 
 mtext("Growth", side=2, line=3.5, outer=TRUE, adj=0.85, cex=1)
@@ -439,6 +435,9 @@ dev.off()
 
 ################################################
 #FIGURE: Observed vs. predicted BA per stand age, and BA trajectories
+
+library(maps)
+library(mapdata)
 
 ##PANEL A
 cols<-colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000)
@@ -464,6 +463,24 @@ panel.modelledba <- function(iPft) {
   map(database="state",regions=states,interior=F,add=T)
 
 }
+
+panel.modelledba <- function(iPft) {
+  
+  x <- apply(modelledba[,iPft,,,]*nplots,c(3,4),FUN=sum)/apply(nplots,c(3,4),FUN=sum)
+  x[x>20] <- 20
+  image(lon,lat,x,col=cols,zlim=c(0,20),add=F,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",asp=1.2)
+  map(database="state",regions=states,interior=F,add=T)
+  
+}
+
+##Small map icons
+#x11(10,6)
+#par(mar=c(0,0,0,0))
+#plot(1,1,pch=NA,xlim=c(-120,-62),ylim=c(25,55))
+#map(database="state",regions=states,interior=F,add=T)
+#rect(-96,20,-68,36)
+#rect(-96,44,-68,36)
+#rect(-96,44,-68,64)
 
 #Function for plotting legend
 color.bar <- function(cols, min, max, nticks=5, ticks=seq(min, max, len=nticks)) {
@@ -506,7 +523,7 @@ panel.modelledba(7)
 par(mar=c(2,0.5,0,0.5))
 color.bar(colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000), 0, 20)
 plot(1,type="n",axes=F,xlab="",ylab="")
-color.bar(colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000), 0, 20)
+plot(1,type="n",axes=F,xlab="",ylab="")
 
 #mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
 #mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.32, cex=1)
@@ -568,10 +585,11 @@ par(mar=c(0.5,0.5,3.5,0.5))
 spp<-c("BC","BH","NC","NH")
 
 plot(n.data$Age,n.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,20),xlab="Age (y)",
-     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1)
+     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,xaxt="n",cex.axis=1.1)
+axis(side=1,at=seq(0,10,2),tick=T,labels=c(0,20,40,60,80,100),cex.axis=1.1)
 for (iSp in spp){
   col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
-             ifelse(iSp=="NH","lightgreen","red"))))
+             ifelse(iSp=="NH","green3","pink2"))))
   
   data<-n.data[n.data$Pft==iSp,]
   data2<-rbind(data,c("north",0,iSp,0,0))
@@ -586,14 +604,15 @@ for (iSp in spp){
 }
 text(2.25,24,"Latitude >44")
 
-spp1<-c("BC","BH","NC","NH","SH")
+spp1<-c("NC","NH","SH")
 
 plot(m.data$Age,m.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,20),xlab="Age (y)",
-     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,yaxt="n")
+     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,yaxt="n",xaxt="n")
+axis(side=1,at=seq(0,10,2),tick=T,labels=c(0,20,40,60,80,100),cex.axis=1.1)
 axis(side=2,at=seq(0,25,5),tick=T,labels=F)
 for (iSp in spp1){
   col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
-                                                                       ifelse(iSp=="NH","lightgreen","red"))))
+                                                                       ifelse(iSp=="NH","green3","pink2"))))
   
   data<-m.data[m.data$Pft==iSp,]
   data2<-rbind(data,c("mid",0,iSp,0,0))
@@ -611,10 +630,11 @@ text(2.25,24,"Latitude 36-44")
 spp2<-c("NH","SC","SH")
 
 plot(s.data$Age,s.data$meanModelledBa,pch=NA,xlim=c(0,10),ylim=c(0,20),xlab="Age (y)",
-     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,yaxt="n")
+     ylab=expression("Basal area (m"^2*" ha"^-1*")"),las=1,yaxt="n",xaxt="n")
+axis(side=1,at=seq(0,10,2),tick=T,labels=c(0,20,40,60,80,100),cex.axis=1.1)
 axis(side=2,at=seq(0,25,5),tick=T,labels=F)
 for (iSp in spp2){
-  col = ifelse(iSp=="SC","darkred",ifelse(iSp=="NH","lightgreen","red"))
+  col = ifelse(iSp=="SC","red2",ifelse(iSp=="NH","green3",ifelse(iSp=="NC","darkgreen","pink2")))
   
   data<-s.data[s.data$Pft==iSp,]
   data2<-rbind(data,c("south",0,iSp,0,0))
@@ -630,9 +650,11 @@ for (iSp in spp2){
 text(2.25,24,"Latitude <36")
 
 par(xpd=NA)
-legend(-24,31,c("BC","BH","NC","NH","SC","SH"),
-       col=c("darkblue","skyblue2","darkgreen","lightgreen","darkred","red"),ncol=6,bty="n",
-       lty=1,lwd=2,cex=1)
+legend(-24.5,26,c("BC (obs)","BC (pred)","BH (obs)","BH (pred)","NC (obs)","NC (pred)",
+                "NH (obs)","NH (pred)","SC (obs)","SC (pred)","SH (obs)","SH (pred)"),                
+                col=c("darkblue","darkblue","skyblue2","skyblue2","darkgreen","darkgreen",
+                      "green3","green3","red2","red2","pink2","pink2"),ncol=6,bty="n",
+                lty=c(rep(c(1,2),6)),lwd=2,cex=1.1)
 
 mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
 mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.32, cex=1)
@@ -644,23 +666,10 @@ mtext("SC",side=1, line=-27, outer=TRUE, adj=-0.07, cex=1.2)
 mtext("BH",side=1, line=-47, outer=TRUE, adj=0.48, cex=1.2)
 mtext("NH",side=1, line=-37, outer=TRUE, adj=0.48, cex=1.2)
 mtext("SH",side=1, line=-27, outer=TRUE, adj=0.48, cex=1.2)
-mtext(expression("Basal area (m"^2*" ha"^-1*")"),side=2,line=32.5,adj=0.99,cex=0.9)
+mtext(expression("Basal area (m"^2*" ha"^-1*")"),side=2,line=32.5,adj=0.4,cex=0.9)
 mtext("Age (y)",side=1,line=2.5,adj=-0.95,cex=0.9)
 mtext("(a)",side=1, line=-52, outer=TRUE, adj=-0.08, cex=1.4)
 mtext("(b)",side=1, line=-15.5, outer=TRUE, adj=-0.08, cex=1.4)
+mtext(expression("Basal area (m"^2*" ha"^-1*")"),side=1,line=-19.25,adj=-2.5,cex=0.9)
 
 dev.off()
-
-##############################################################
-#FIGURE: Changes in predicted demographic rates
-#Now per functional type.
-
-#Add percent change to totdata dataframe
-totdata$perc.Growth<-(totdata$GrowthPrior/totdata$GrowthModelled)*100
-totdata$perc.Mort<-(totdata$MortPrior/totdata$MortModelled)*100
-totdata$perc.Ing<-(totdata$IngPrior/totdata$IngModelled)*100
-
-#Calculate average percent change per Pft and SE
-avgperc<-aggregate(totdata[,c("perc.Growth","perc.Mort","perc.Ing")],
-                   list(totdata$Pft),mean,na.rm=T)
-names(avgperc)<-c("Pft","perc.Growth","perc.Mort","perc.Ing")
