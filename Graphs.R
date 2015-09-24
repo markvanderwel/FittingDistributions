@@ -307,29 +307,30 @@ par(mar=c(0.5,0.5,0.5,0.5),oma=c(4,5.5,1.75,0.5))
 layout(matrix(1:6,nrow=3,byrow=T))
 
 y.lim = list(
-  G = c(exp(-4.5),exp(1.4)),
-  M = c(exp(2.5),exp(6.2)),
-  R = c(exp(-2),exp(6.2))
+  G = c(0.2,3),
+  M = c(15,500),
+  R = c(2,500)
 )
+
+# Limits calculated as the 1st and 99th percentiles of grid cells 
+# where PFT had BA >1.0 in FIA plots
 
 x.lim.Temp = list(
-  BC = c(2,9),
-  BH = c(2,10),
-  NC = c(2,14),
-  NH = c(2,20),
-  SC = c(7,23),
-  SH = c(6,22)
+  BC = c(2.3,7.25),
+  BH = c(2.3,8.4),
+  NC = c(2.3,14.2),
+  NH = c(2.3,19.1),
+  SC = c(10.8,19.6),
+  SH = c(5.6,19.3)
 )
 
-#This is a guess, what values should be included?
-#1 and 99 percentiles result in different values for temperature?
 x.lim.Precip = list(
-  BC = c(45,118),
-  BH = c(44,115),
-  NC = c(46,152),
-  NH = c(46,143),
-  SC = c(68,144),
-  SH = c(62,150)
+  BC = c(49,100),
+  BH = c(49,97),
+  NC = c(49,137),
+  NH = c(50,134),
+  SC = c(85,136),
+  SH = c(62,137)
 )
 
 #Graph panels: first Temp
@@ -338,7 +339,7 @@ for (iDemo in demo) {
     pardata.sub <- subset(pardata,Demo==iDemo)
     
     with(pardata.sub,plot(Temp,exp(LogValue),pch=NA,las=1,xaxt="n",
-                          ylim=y.lim[[iDemo]],xlab="",ylab="",log="y",cex.axis=1.2))
+                          ylim=y.lim[[iDemo]],xlab="",ylab="",log="y",xlim=c(2,20),cex.axis=1.2))
         
     if(iDemo=="R") axis(side=1,at=c(5,10,15,20),tick=T,labels=T,cex.axis=1.2) else axis(side=1,at=c(5,10,15,20),tick=T,labels=F)
           
@@ -379,7 +380,7 @@ for (iDemo in demo) {
   ################
   #Same for Precip
   with(pardata.sub,plot(Precip,exp(LogValue),pch=NA,ylim=y.lim[[iDemo]],
-                        xaxt="n",yaxt="n",xlab="",ylab="",log="y"))
+                        xaxt="n",yaxt="n",xlab="",ylab="",log="y", xlim=c(50,140)))
   axis(side=1,at=c(40,60,80,100,120,140),tick=T,labels=F)
   
   if(iDemo=="G") axis(side=2,at=c(0.01,0.02,0.05,0.1,0.2,0.5,1,2,5),tick=T,labels=F)
@@ -409,7 +410,7 @@ for (iDemo in demo) {
     pd.horz$PredMin = exp(predict(loess(pd.horz$LogValueMin~pd.horz$Precip)))
     pd.horz$PredMed = exp(predict(loess(pd.horz$LogValueMed~pd.horz$Precip)))
     pd.horz$PredMax = exp(predict(loess(pd.horz$LogValueMax~pd.horz$Precip)))
-    pd.horz2<-pd.horz[pd.horz$Precip>x.lim.Temp[[iSp]][1] & pd.horz$Precip<x.lim.Precip[[iSp]][2],]
+    pd.horz2<-pd.horz[pd.horz$Precip>x.lim.Precip[[iSp]][1] & pd.horz$Precip<x.lim.Precip[[iSp]][2],]
     
     #add lines
     pd.horz2<-pd.horz2[order(pd.horz2$Precip),]
