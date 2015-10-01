@@ -30,7 +30,8 @@ cols<-colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","r
 
 #read in NCDF data file variables
 
-nc <- nc_open("D:\\code\\UF\\io\\FittingOutput.nc", readunlim=F)
+nc <- nc_open("FittingOutput.nc", readunlim=F)
+#nc <- nc_open("D:\\code\\UF\\io\\FittingOutput.nc", readunlim=F)
 #nc <- nc_open("D:\\code\\UF\\io\\FittingOutput - NoNeighbourhoodPriors.nc", readunlim=F)
 #nc <- nc_open("D:\\code\\UF\\io\\FittingOutput - FirstPassNeighbourhoodPriors.nc", readunlim=F)
 #nc <- nc_open("D:\\code\\UF\\io\\FittingOutput - SecondPassNeighbourhoodPriors.nc", readunlim=F)
@@ -41,7 +42,8 @@ nc <- nc_open("D:\\code\\UF\\io\\FittingOutput.nc", readunlim=F)
 #nc <- nc_open("D:\\code\\UF\\io\\FittingOutput - SeventhPassNeighbourhoodPriors.nc", readunlim=F)
 #nc <- nc_open("D:\\code\\UF\\io\\FittingOutput - EighthPassNeighbourhoodPriors.nc", readunlim=F)
 
-nc.orig <- nc_open("D:\\code\\UF\\io\\SimOutWithClimData.nc", readunlim=F)
+nc.orig <- nc_open("SimOutWithClimData.nc", readunlim=F)
+#nc.orig <- nc_open("D:\\code\\UF\\io\\SimOutWithClimData.nc", readunlim=F)
 
 ba.orig <- ncvar_get(nc.orig,"Ba")
 
