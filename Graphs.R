@@ -7,7 +7,6 @@ library(RColorBrewer)
 library(filzbach)
 
 nc <- nc_open("FittingOutput.nc", readunlim=F)
-#print(nc)
 
 nc.orig <- nc_open("SimOutWithClimData.nc", readunlim=F)
 
@@ -157,13 +156,6 @@ totdata <- data.frame(Cell=df.cell,Age=df.age,Lon=df.lon,Lat=df.lat,PlotClass=df
                    GrowthLower=df.growthlower95,MortLower=df.mortlower95,IngLower=df.inglower95,
                    Temperature=df.celltemperature,Precipitation=df.cellprecipitation)
 
-##Add color code to dataset.
-#totdata$col<-ifelse(totdata$Pft=="BC","darkblue",
-#                    ifelse(totdata$Pft=="BH","skyblue2",
-#                           ifelse(totdata$Pft=="NC","darkgreen",
-#                                  ifelse(totdata$Pft=="NH","lightgreen",
-#                                         ifelse(totdata$Pft=="SC","darkred","red")))))
-
 #Add unique code for cell and for region (north vs. south)
 totdata$Lat_Lon<-paste(totdata$Lat,totdata$Lon,sep="_")
 totdata$region<-ifelse(totdata$Lat<36,"south",ifelse(totdata$Lat<44,"mid","north"))
@@ -173,40 +165,40 @@ totdata$region<-ifelse(totdata$Lat<36,"south",ifelse(totdata$Lat<44,"mid","north
 #Now per functional type.
 
 #x11(6.5,8)
-pdf("Figure goodness of fit.pdf",width=6.5,height=8)
+pdf("Figure 3 goodness of fit.pdf",width=6.5,height=8)
 par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
 
 plot(totdata$ModelledBa[totdata$Pft=="BC"],totdata$FiaBa[totdata$Pft=="BC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(1.5,29,"BC",cex=1.4)
+text(5.75,29.5,"Boreal Conifer",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="BH"],totdata$FiaBa[totdata$Pft=="BH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 axis(side=2,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(1.5,29,"BH",cex=1.4)
+text(6.75,29.5,"Boreal Hardwood",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="NC"],totdata$FiaBa[totdata$Pft=="NC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(1.5,29,"NC",cex=1.4)
+text(11.25,29.5,"Northern Temperate Conifer",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="NH"],totdata$FiaBa[totdata$Pft=="NH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 axis(side=2,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(1.5,29,"NH",cex=1.4)
+text(12.25,29.5,"Northern Temperate Hardwood",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="SC"],totdata$FiaBa[totdata$Pft=="SC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
 abline(0,1,lwd=2,lty=2)
-text(1.5,29,"SC",cex=1.4)
+text(11.5,29.5,"Southern Temperate Conifer",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="SH"],totdata$FiaBa[totdata$Pft=="SH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,yaxt="n",col=rgb(0,0,0,0.15),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,yaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(1.5,29,"SH",cex=1.4)
+text(12.5,29.5,"Southern Temperate Hardwood",cex=1.4)
 
 mtext(expression("Observed basal area (m"^2*" ha"^-1*")"),
       side=2, line=2, outer=TRUE, adj=0.5, cex=1)
@@ -258,7 +250,7 @@ fiadbh3[,4] <- apply(fiadbh2,1,FUN=weighted.mean,w=fian2,na.rm=T)
 modeldbh3[,4] <- apply(modeldbh2,1,FUN=weighted.mean,w=fian2,na.rm=T)
 
 #x11(7.75,3.5)
-pdf("Figure size distributions.pdf",width=7.75,height=3.5)
+pdf("Figure 4 size distributions.pdf",width=7.75,height=3.5)
 par(mfrow=c(1,4),mar=c(0.5,0.5,0.5,0.5),oma=c(4,5,1.5,0.1))
 
 dbhcomp <- cbind(fiadbh3[,1],modeldbh3[,1])
@@ -287,10 +279,10 @@ legend("topright",c("Observed","Predicted"),
 mtext(expression("Density (stems ha"^-1*")"),side=2, line=3, outer=TRUE, adj=0.5, cex=1)
 mtext("DBH midpoint (cm)",side=1, line=2.5, outer=TRUE, adj=0.5, cex=1)
 
-mtext("0-50 y",side=3, line=0.1, outer=TRUE, adj=0.11, cex=0.9)
-mtext("60-70 y",side=3, line=0.1, outer=TRUE, adj=0.37, cex=0.9)
-mtext("> 80 y",side=3, line=0.1, outer=TRUE, adj=0.63, cex=0.9)
-mtext("All ages",side=3, line=0.1, outer=TRUE, adj=0.91, cex=0.9)
+mtext("0-54 y",side=3, line=0.1, outer=TRUE, adj=0.11, cex=0.9)
+mtext("55-74 y",side=3, line=0.1, outer=TRUE, adj=0.37, cex=0.9)
+mtext(expression("">= 75 *y),side=3, line=-0.15, outer=TRUE, adj=0.63, cex=0.9)
+mtext("All",side=3, line=0.1, outer=TRUE, adj=0.88, cex=0.9)
 
 dev.off()
 
@@ -300,7 +292,7 @@ dev.off()
 #RUN "kriging testing 2" script to generate predictions ("pardata")
 
 #x11(6.5,6.5)
-pdf("Figure demography-climate.pdf",width=6.5,height=6.5)
+pdf("Figure 6 demography-climate.pdf",width=6.5,height=6.5)
 par(mar=c(0.5,0.5,0.5,0.5),oma=c(4,5.5,1.75,0.5))
 layout(matrix(1:6,nrow=3,byrow=T))
 
@@ -336,14 +328,19 @@ for (iDemo in demo) {
       
     pardata.sub <- subset(pardata,Demo==iDemo)
     
-    with(pardata.sub,plot(Temp,exp(LogValue),pch=NA,las=1,xaxt="n",
-                          ylim=y.lim[[iDemo]],xlab="",ylab="",log="y",xlim=c(2,20),cex.axis=1.2))
-        
+    with(pardata.sub,plot(Temp,exp(LogValue),pch=NA,las=1,xaxt="n",yaxt="n",
+                          ylim=y.lim[[iDemo]],xlab="",ylab="",log="y",xlim=c(2,20)))
+    
+    if(iDemo=="G") axis(side=2,at=c(0.01,0.02,0.05,0.1,0.2,0.5,1,2,5),tick=T,labels=T,cex.axis=1.2,las=1)
+    if(iDemo=="M") axis(side=2,at=c(10,20,50,100,200,500),tick=T,labels=T,cex.axis=1.2,las=1)
+    if(iDemo=="R") axis(side=2,at=c(2,5,20,50,200,500),tick=T,labels=T,cex.axis=1.2,las=1)
+
     if(iDemo=="R") axis(side=1,at=c(5,10,15,20),tick=T,labels=T,cex.axis=1.2) else axis(side=1,at=c(5,10,15,20),tick=T,labels=F)
           
     for (iSp in species[-1]) {
        
       pardata.sub.Sp <- subset(pardata.sub, Pft==iSp)
+      pardata.sub.Sp$Lat_Lon<-paste(pardata.sub.Sp$Lat,pardata.sub.Sp$Lon,sep="_")
       
       col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
                                     ifelse(iSp=="NH","green3",ifelse(iSp=="SC","red2","pink2")))))
@@ -382,13 +379,15 @@ for (iDemo in demo) {
   axis(side=1,at=c(40,60,80,100,120,140),tick=T,labels=F)
   
   if(iDemo=="G") axis(side=2,at=c(0.01,0.02,0.05,0.1,0.2,0.5,1,2,5),tick=T,labels=F)
-  if(iDemo=="M") axis(side=2,at=c(10,20,50,100,200,500),tick=T,labels=F) else axis(side=2,at=c(0.1,0.5,1,5,10,50,100,500),tick=T,labels=F)
+  if(iDemo=="M") axis(side=2,at=c(10,20,50,100,200,500),tick=T,labels=F)
+  if(iDemo=="R") axis(side=2,at=c(2,5,20,50,200,500),tick=T,labels=F,cex.axis=1.2)
   
-  if(iDemo=="R") axis(side=1,at=c(40,60,80,100,120,140),tick=T,labels=T,cex.axis=1.2) else axis(side=1,at=c(5,10,15,20),tick=T,labels=F)
+  if(iDemo=="R") axis(side=1,at=c(40,60,80,100,120,140),tick=T,labels=T,cex.axis=1.2)
     
   for (iSp in species[-1]) {
     
     pardata.sub.Sp <- subset(pardata.sub, Pft==iSp)
+    pardata.sub.Sp$Lat_Lon<-paste(pardata.sub.Sp$Lat,pardata.sub.Sp$Lon,sep="_")
     
     col = ifelse(iSp=="BC","darkblue",ifelse(iSp=="BH","skyblue2",ifelse(iSp=="NC","darkgreen",
                                                 ifelse(iSp=="NH","green3",ifelse(iSp=="SC","red2","pink2")))))
@@ -422,15 +421,15 @@ for (iDemo in demo) {
 }
 
 par(xpd=NA)
-legend(-75,exp(27),c("BC","BH","NC","NH","SC","SH"),
+legend(-59,exp(20.3),c("BC","BH","NC","NH","SC","SH"),
        col=c("darkblue","skyblue2","darkgreen","green3","red2","pink2"),ncol=6,bty="n",
        lty=1,lwd=2,cex=1.4)
 
-mtext("Growth", side=2, line=3.5, outer=TRUE, adj=0.85, cex=1)
-mtext("Mortality", side=2, line=3.5, outer=TRUE, adj=0.5, cex=1)
-mtext("Recruitment", side=2, line=3.5, outer=TRUE, adj=0.1, cex=1)
+mtext(expression("Growth (cm y"^-1*")"), side=2, line=3, outer=TRUE, adj=0.92, cex=1)
+mtext("Longevity (y)", side=2, line=3.25, outer=TRUE, adj=0.52, cex=1)
+mtext(expression("Recruitment (ha"^-1*" yr"^-1*")"), side=2, line=3, outer=TRUE, adj=0.04, cex=1)
 mtext("Mean annual precipitation (mm)", side=1, line=2.5, 
-      outer=TRUE, adj=0.9, cex=1)
+      outer=TRUE, adj=0.92, cex=1)
 mtext(expression(paste("Mean annual temperature (",degree,"C)")), 
       side=1, line=2.75, outer=TRUE, adj=0.1, cex=1)
 
@@ -477,13 +476,15 @@ panel.modelledba <- function(iPft) {
 }
 
 ##Small map icons
-#x11(10,6)
-#par(mar=c(0,0,0,0))
-#plot(1,1,pch=NA,xlim=c(-120,-62),ylim=c(25,55))
-#map(database="state",regions=states,interior=F,add=T)
-#rect(-96,20,-68,36)
-#rect(-96,44,-68,36)
-#rect(-96,44,-68,64)
+#x11(5,3)
+pdf("Small map to format.pdf",width=5,height=3)
+par(mar=c(0,0,0,0))
+plot(1,1,pch=NA,xlim=c(-120,-62),ylim=c(25,55))
+map(database="state",regions=states,interior=F,add=T)
+rect(-98,20,-65,36)
+rect(-98,44,-65,36)
+rect(-98,44,-65,64)
+dev.off()
 
 #Function for plotting legend
 color.bar <- function(cols, min, max, nticks=5, ticks=seq(min, max, len=nticks)) {
@@ -498,8 +499,8 @@ color.bar <- function(cols, min, max, nticks=5, ticks=seq(min, max, len=nticks))
   }
 }
 
-x11(6.5,7.5)
-#pdf("Figure obs vs pred BA maps.pdf",width=6.5,height=7.5)
+#x11(6.5,7.5)
+pdf("Figure 2 obs vs pred BA maps.pdf",width=6.5,height=7.5)
 m<-rbind(c(1,2,2,3,3,4,4,5),c(6,7,7,8,8,9,9,10),c(11,12,12,13,13,14,14,15),
          c(16,16,16,17,17,18,18,18),c(19,19,20,20,20,20,21,21))
 layout(m,widths=c(rep(c(1.4,0.6,0.8,0.2,0.2,0.8,0.6,1.4),5)),
@@ -527,17 +528,6 @@ par(mar=c(2,0.5,0,0.5))
 color.bar(colorRampPalette(c("blue","dodgerblue","cyan","green","yellow","orange","red"))(1000), 0, 20)
 plot(1,type="n",axes=F,xlab="",ylab="")
 plot(1,type="n",axes=F,xlab="",ylab="")
-
-#mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
-#mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.32, cex=1)
-#mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.66, cex=1)
-#mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.93, cex=1)
-#mtext("BC",side=1, line=-28, outer=TRUE, adj=-0.07, cex=1.2)
-#mtext("NC",side=1, line=-17, outer=TRUE, adj=-0.07, cex=1.2)
-#mtext("SC",side=1, line=-7, outer=TRUE, adj=-0.07, cex=1.2)
-#mtext("BH",side=1, line=-28, outer=TRUE, adj=0.48, cex=1.2)
-#mtext("NH",side=1, line=-17, outer=TRUE, adj=0.48, cex=1.2)
-#mtext("SH",side=1, line=-7, outer=TRUE, adj=0.48, cex=1.2)
 
 ##PANEL B
 ##Based on totdata: calculate weighted average per plot age.
@@ -601,11 +591,10 @@ for (iSp in spp){
 
   #lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
   #lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
-  lines(0:10,obs.traj["North",1:11,match(iSp,species[-1])],col=col,lwd=2)
-  lines(0:10,pred.traj["North",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
+  lines(0:10,obs.traj["North",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
+  lines(0:10,pred.traj["North",1:11,match(iSp,species[-1])],col=col,lwd=2)
   
 }
-text(2.25,24,"Latitude >44")
 
 spp1<-c("NC","NH","SH")
 
@@ -624,11 +613,10 @@ for (iSp in spp1){
   
   #lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
   #lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
-  lines(0:10,obs.traj["Mid",1:11,match(iSp,species[-1])],col=col,lwd=2)
-  lines(0:10,pred.traj["Mid",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
+  lines(0:10,obs.traj["Mid",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
+  lines(0:10,pred.traj["Mid",1:11,match(iSp,species[-1])],col=col,lwd=2)
   
 }
-text(2.25,24,"Latitude 36-44")
 
 spp2<-c("NH","SC","SH")
 
@@ -646,33 +634,32 @@ for (iSp in spp2){
     
   #lines(data2$Age,data2$meanFiaBa,col=col,lwd=2)
   #lines(data2$Age,data2$meanModelledBa,col=col,lty=5,lwd=2)
-  lines(0:10,obs.traj["South",1:11,match(iSp,species[-1])],col=col,lwd=2)
-  lines(0:10,pred.traj["South",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
+  lines(0:10,obs.traj["South",1:11,match(iSp,species[-1])],col=col,lty=5,lwd=2)
+  lines(0:10,pred.traj["South",1:11,match(iSp,species[-1])],col=col,lwd=2)
   
 }
-text(2.25,24,"Latitude <36")
 
 par(xpd=NA)
 legend(-24.5,26,c("BC (obs)","BC (pred)","BH (obs)","BH (pred)","NC (obs)","NC (pred)",
                 "NH (obs)","NH (pred)","SC (obs)","SC (pred)","SH (obs)","SH (pred)"),                
                 col=c("darkblue","darkblue","skyblue2","skyblue2","darkgreen","darkgreen",
                       "green3","green3","red2","red2","pink2","pink2"),ncol=6,bty="n",
-                lty=c(rep(c(1,2),6)),lwd=2,cex=1.1)
+                lty=c(rep(c(2,1),6)),lwd=2,cex=1.1)
 
 mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.06, cex=1)
 mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.32, cex=1)
 mtext("observed",side=3, line=-0.05, outer=TRUE, adj=0.66, cex=1)
 mtext("predicted",side=3, line=-0.05, outer=TRUE, adj=0.93, cex=1)
-mtext("BC",side=1, line=-47, outer=TRUE, adj=-0.07, cex=1.2)
-mtext("NC",side=1, line=-37, outer=TRUE, adj=-0.07, cex=1.2)
-mtext("SC",side=1, line=-27, outer=TRUE, adj=-0.07, cex=1.2)
-mtext("BH",side=1, line=-47, outer=TRUE, adj=0.48, cex=1.2)
-mtext("NH",side=1, line=-37, outer=TRUE, adj=0.48, cex=1.2)
-mtext("SH",side=1, line=-27, outer=TRUE, adj=0.48, cex=1.2)
+mtext("BC",side=1, line=-47, outer=TRUE, adj=-0.045, cex=1.2)
+mtext("NC",side=1, line=-37, outer=TRUE, adj=-0.045, cex=1.2)
+mtext("SC",side=1, line=-27, outer=TRUE, adj=-0.045, cex=1.2)
+mtext("BH",side=1, line=-47, outer=TRUE, adj=0.515, cex=1.2)
+mtext("NH",side=1, line=-37, outer=TRUE, adj=0.515, cex=1.2)
+mtext("SH",side=1, line=-27, outer=TRUE, adj=0.515, cex=1.2)
 mtext(expression("Basal area (m"^2*" ha"^-1*")"),side=2,line=32.5,adj=0.4,cex=0.9)
 mtext("Age (y)",side=1,line=2.5,adj=-0.95,cex=0.9)
-mtext("(a)",side=1, line=-52, outer=TRUE, adj=-0.08, cex=1.4)
-mtext("(b)",side=1, line=-15.5, outer=TRUE, adj=-0.08, cex=1.4)
+mtext("(a)",side=1, line=-52, outer=TRUE, adj=-0.08, cex=1.3)
+mtext("(b)",side=1, line=-15.5, outer=TRUE, adj=-0.08, cex=1.3)
 mtext(expression("Basal area (m"^2*" ha"^-1*")"),side=1,line=-19.25,adj=-2.5,cex=0.9)
 
 dev.off()

@@ -110,8 +110,8 @@ for (iPft in unique(totdata$Pft)) {
 
 #################
 ###Graph coefficients relative BA vs. demography
-#x11(3.8,5.5)
-pdf("Figure coefs relative BA vs. demography.pdf",width=3.8,height=5.5)
+#x11(4.5,6.5)
+pdf("Figure 7 coefs relative BA vs. demography.pdf",width=4.5,height=6.5)
 par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(3.75,4.25,1.75,0.5))
 
 #G=red, M=blue, R=grey
@@ -119,61 +119,92 @@ par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(3.75,4.25,1.75,0.5))
 x <- c(1:10)
 
 iPft<-"BC"
-plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=16,col="red",
-     ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n")
-axis(side=1,at=c(2,4,6,8,10),labels=F)
-points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=16,col="blue",cex=1.4)
-points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=16,col="grey60",cex=1.4)
-text(1.75,1.25,iPft,cex=1.2)
+plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=21,col="red",bg="red",
+     xlim=c(0,10),ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n")
+axis(side=1,at=c(0,2,4,6,8,10),labels=F)
+points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=22,col="blue",
+       bg="blue",cex=1.4)
+points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=24,col="grey60",
+       bg="grey60",cex=1.4)
+text(0.75,1.25,iPft,cex=1.2)
+text(9,0.1,"G",cex=1.2,col="red")
+text(2,0,"L",cex=1.2,col="blue")
+text(3,0.85,"R",cex=1.2,col="grey60")
 
 iPft<-"BH"
-plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=16,col="red",
-     ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n",yaxt="n")
-axis(side=1,at=c(2,4,6,8,10),labels=F)
+plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=21,col="red",bg="red",
+     xlim=c(0,10),ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n",yaxt="n")
+axis(side=1,at=c(0,2,4,6,8,10),labels=F)
 axis(side=2,at=seq(0.0,1.5,0.5),labels=F)
-points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=16,col="blue",cex=1.4)
-points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=16,col="grey60",cex=1.4)
-text(1.75,1.25,iPft,cex=1.2)
+points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=22,col="blue",
+       bg="blue",cex=1.4)
+points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=24,col="grey60",
+       bg="grey60",cex=1.4)
+text(0.75,1.25,iPft,cex=1.2)
+text(9,0.8,"G",cex=1.2,col="red")
+text(7,0.15,"L",cex=1.2,col="blue")
+text(2,1,"R",cex=1.2,col="grey60")
 
 iPft<-"NC"
-plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=16,col="red",
-     ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n")
-axis(side=1,at=c(2,4,6,8,10),labels=F)
-points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=16,col="blue",cex=1.4)
-points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=16,col="grey60",cex=1.4)
-text(1.75,1.25,iPft,cex=1.2)
+plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=21,col="red",bg="red",
+     xlim=c(0,10),ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n")
+axis(side=1,at=c(0,2,4,6,8,10),labels=F)
+points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=22,col="blue",
+       bg="blue",cex=1.4)
+points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=24,col="grey60",
+       bg="grey60",cex=1.4)
+text(0.75,1.25,iPft,cex=1.2)
+text(9,0.75,"G",cex=1.2,col="red")
+text(6,0.7,"L",cex=1.2,col="blue")
+text(8,0.1,"R",cex=1.2,col="grey60")
 
 iPft<-"NH"
-plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=16,col="red",
-     ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n",yaxt="n")
-axis(side=1,at=c(2,4,6,8,10),labels=F)
+plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=21,col="red",bg="red",
+     xlim=c(0,10),ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n",yaxt="n")
+axis(side=1,at=c(0,2,4,6,8,10),labels=F)
 axis(side=2,at=seq(0.0,1.5,0.5),labels=F)
-points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=16,col="blue",cex=1.4)
-points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=16,col="grey60",cex=1.4)
-text(1.75,1.25,iPft,cex=1.2)
+points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=22,col="blue",
+       bg="blue",cex=1.4)
+points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=24,col="grey60",
+       bg="grey60",cex=1.4)
+text(0.75,1.25,iPft,cex=1.2)
+text(7,1.2,"G",cex=1.2,col="red")
+text(8,-0.05,"L",cex=1.2,col="blue")
+text(1,0.75,"R",cex=1.2,col="grey60")
 
 iPft<-"SC"
-plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=16,col="red",
-     ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n")
-axis(side=1,at=c(2,4,6,8,10),labels=c(20,40,60,80,100),cex.axis=1.15)
-points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=16,col="blue",cex=1.4)
-points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=16,col="grey60",cex=1.4)
-text(1.75,1.25,iPft,cex=1.2)
+plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=21,col="red",bg="red",
+     xlim=c(0,10),ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n")
+axis(side=1,at=c(0,2,4,6,8,10),labels=c(0,20,40,60,80,100),cex.axis=1.15)
+points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=22,col="blue",
+       bg="blue",cex=1.4)
+points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=24,col="grey60",
+       bg="grey60",cex=1.4)
+text(0.75,1.25,iPft,cex=1.2)
+text(8,1.2,"G",cex=1.2,col="red")
+text(5,-0.1,"L",cex=1.2,col="blue")
+text(1,0.9,"R",cex=1.2,col="grey60")
 
 iPft<-"SH"
-plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=16,col="red",
-     ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n",yaxt="n")
-axis(side=1,at=c(2,4,6,8,10),labels=c(20,40,60,80,100),cex.axis=1.15)
+plot(x,save.coef[iPft,2]+save.coef[iPft,7]*x+save.coef[iPft,8]*x^2,type="b",pch=21,col="red",bg="red",
+     xlim=c(0,10),ylim=c(-0.4,1.3),las=1,cex=1.4,cex.axis=1.15,xaxt="n",yaxt="n")
+axis(side=1,at=c(0,2,4,6,8,10),labels=c(0,20,40,60,80,100),cex.axis=1.15)
 axis(side=2,at=seq(0.0,1.5,0.5),labels=F)
-points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=16,col="blue",cex=1.4)
-points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=16,col="grey60",cex=1.4)
-text(1.75,1.25,iPft,cex=1.2)
+points(x,save.coef[iPft,3]+save.coef[iPft,9]*x+save.coef[iPft,10]*x^2,type="b",pch=22,col="blue",
+       bg="blue",cex=1.4)
+points(x,save.coef[iPft,4]+save.coef[iPft,11]*x+save.coef[iPft,12]*x^2,type="b",pch=24,col="grey60",
+       bg="grey60",cex=1.4)
+text(0.75,1.25,iPft,cex=1.2)
+text(3,0.45,"G",cex=1.2,col="red")
+text(7,0.22,"L",cex=1.2,col="blue")
+text(2,0.9,"R",cex=1.2,col="grey60")
 
 par(xpd=NA)
-legend(-11.5,5.8,c("Growth","Recruitment","Mortality"),
-       lty=1,pch=16,cex=1.3,pt.cex=1.4,col=c("red","blue","grey60"),bty="n",ncol=3)
-mtext("Coefficient", side=2, line=2.5, outer=TRUE, adj=0.5, cex=1)
-mtext("Age (y)", side=1, line=2, outer=TRUE, adj=0.5, cex=1)
+legend(-11.5,5.62,c("Growth","Longevity","Recruitment"),
+       lty=1,pch=c(21,22,24),cex=1.3,pt.cex=1.4,col=c("red","blue","grey60"),
+       pt.bg=c("red","blue","grey60"),bty="n",ncol=3)
+mtext("Standardized effect", side=2, line=2.5, outer=TRUE, adj=0.5, cex=1)
+mtext("Age (y)", side=1, line=2, outer=TRUE, adj=0.52, cex=1)
 
 dev.off()
 

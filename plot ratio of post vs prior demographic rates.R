@@ -53,21 +53,43 @@ text(c(3.5,9.5,15.5),0.2,labels=c("Growth","Longevity","Recruitment"),adj=0.5)
 
 cols<-c("darkblue","skyblue2","darkgreen","green3","red2","pink2")
 
-x11(6.5,3)
-#pdf("Figure ratio posterior and prior demographic rates.pdf",width=6.5,height=3)
-par(mar=c(0.5,4,1.5,0.5))
-plot(as.numeric(mean.ratios),ylim=c(0.5,2.5),ylab="Posterior mean / prior mean",xlab="",xaxt="n",
-     cex.axis=0.8,las=1,pch=NA)
-#axis(side=1,at=c(1:18),tick=T,labels=rep(row.names(mean.ratios),3),cex.axis=0.78)
-arrows(1:18,as.numeric(mean.ratios+sd.ratios),
-       y1=as.numeric(mean.ratios-sd.ratios),angle=90,length=0,col=c(rep(cols,3)))
-abline(1,0,lty=2)
-abline(v=c(6.5,12.5),lty=1)
-points(as.numeric(mean.ratios),pch=16,col=c(rep(cols,3)),
-       cex=1.4)
-legend("topright",pch=16,col=cols,pt.cex=1.4,c(row.names(mean.ratios)),ncol=3,bty="n")
+#x11(6.5,2.5)
+pdf("Figure 5 ratio posterior and prior demographic rates.pdf",width=6.5,height=2.5)
+par(mfrow=c(1,3),mar=c(0.5,0.5,0.5,0.5),oma=c(2,4,1.5,0))
+
+plot(as.numeric(mean.ratios[1:6]),ylim=c(0.5,2.5),ylab="",xlab="",xaxt="n",
+     log="y",cex.axis=1.2,las=1,pch=NA,xlim=c(0.75,6.25))
+axis(side=1,at=c(1:6),tick=T,labels=row.names(mean.ratios),cex.axis=1.17)
+arrows(0.5,1,6.5,1,lty=2,length=0)
+arrows(1:6,as.numeric(mean.ratios[1:6]+sd.ratios[1:6]),
+       y1=as.numeric(mean.ratios[1:6]-sd.ratios[1:6]),angle=90,length=0,col=cols)
+points(as.numeric(mean.ratios[1:6]),pch=16,col=cols,cex=1.8)
+
+plot(as.numeric(mean.ratios[7:12]),ylim=c(0.5,2.5),ylab="",xlab="",xaxt="n",
+     yaxt="n",log="y",pch=NA,xlim=c(0.75,6.25))
+axis(side=1,at=c(1:6),tick=T,labels=row.names(mean.ratios),cex.axis=1.17)
+axis(side=2,at=c(0.5,1,1.5,2.5),tick=T,labels=F)
+arrows(0.5,1,6.5,1,lty=2,length=0)
+arrows(1:6,as.numeric(mean.ratios[7:12]+sd.ratios[7:12]),
+       y1=as.numeric(mean.ratios[7:12]-sd.ratios[7:12]),angle=90,length=0,col=cols)
+
+points(as.numeric(mean.ratios[7:12]),pch=16,col=cols,cex=1.8)
+
+plot(as.numeric(mean.ratios[13:18]),ylim=c(0.5,2.5),ylab="",xlab="",xaxt="n",
+     yaxt="n",log="y",pch=NA,xlim=c(0.75,6.25))
+axis(side=1,at=c(1:6),tick=T,labels=row.names(mean.ratios),cex.axis=1.17)
+axis(side=2,at=c(0.5,1,1.5,2.5),tick=T,labels=F)
+arrows(0.5,1,6.5,1,lty=2,length=0)
+arrows(1:6,as.numeric(mean.ratios[13:18]+sd.ratios[13:18]),
+       y1=as.numeric(mean.ratios[13:18]-sd.ratios[13:18]),angle=90,length=0,col=cols)
+points(as.numeric(mean.ratios[13:18]),pch=16,col=cols,cex=1.8)
+
+#legend("topright",pch=16,col=cols,pt.cex=1.4,c(row.names(mean.ratios)),ncol=3,bty="n")
 
 par(xpd=NA)
-text(c(3.5,9.5,15.5),2.7,labels=c("Growth","Longevity","Recruitment"),adj=0.5)
+mtext("Growth",side=3,line=0.5,cex=1,adj=-2.5)
+mtext("Longevity",side=3,line=0.5,cex=1,adj=-1.25)
+mtext("Recruitment",side=3,line=0.5,cex=1,adj=0.5)
+mtext("Posterior mean / prior mean",side=2,line=33.25,adj=0.5)
 
 dev.off()
