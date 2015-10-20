@@ -163,39 +163,40 @@ totdata$region<-ifelse(totdata$Lat<36,"south",ifelse(totdata$Lat<44,"mid","north
 ##############################################################
 #FIGURE: Goodness of fit: observed vs predicted PFT basal area
 #Now per functional type.
+#col=rgb(0,0,0,0.2),pch=16
 
 #x11(6.5,8)
 pdf("Figure 3 goodness of fit.pdf",width=6.5,height=8)
 par(mfrow=c(3,2),mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0.1,0.1))
 
 plot(totdata$ModelledBa[totdata$Pft=="BC"],totdata$FiaBa[totdata$Pft=="BC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
 text(5.75,29.5,"Boreal Conifer",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="BH"],totdata$FiaBa[totdata$Pft=="BH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 axis(side=2,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
 text(6.75,29.5,"Boreal Hardwood",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="NC"],totdata$FiaBa[totdata$Pft=="NC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
 text(11.25,29.5,"Northern Temperate Conifer",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="NH"],totdata$FiaBa[totdata$Pft=="NH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 axis(side=2,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
 text(12.25,29.5,"Northern Temperate Hardwood",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="SC"],totdata$FiaBa[totdata$Pft=="SC"],
-     xlim=c(0,30),ylim=c(0,30),las=1,col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,cex=1.8,cex.axis=1.2)
 abline(0,1,lwd=2,lty=2)
 text(11.5,29.5,"Southern Temperate Conifer",cex=1.4)
 plot(totdata$ModelledBa[totdata$Pft=="SH"],totdata$FiaBa[totdata$Pft=="SH"],
-     xlim=c(0,30),ylim=c(0,30),las=1,yaxt="n",col=rgb(0,0,0,0.2),pch=16,cex=1.8,cex.axis=1.2)
+     xlim=c(0,30),ylim=c(0,30),las=1,yaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
 text(12.5,29.5,"Southern Temperate Hardwood",cex=1.4)
