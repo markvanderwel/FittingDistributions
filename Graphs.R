@@ -174,32 +174,43 @@ plot(totdata$ModelledBa[totdata$Pft=="BC"],totdata$FiaBa[totdata$Pft=="BC"],
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
 text(5.75,29.5,"Boreal Conifer",cex=1.4)
+text(3.65,27,expression(italic(r)^2 *" = 0.76"),cex=1.4)
+
 plot(totdata$ModelledBa[totdata$Pft=="BH"],totdata$FiaBa[totdata$Pft=="BH"],
      xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 axis(side=2,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(6.75,29.5,"Boreal Hardwood",cex=1.4)
+text(6.85,29.5,"Boreal Hardwood",cex=1.4)
+text(3.65,27,expression(italic(r)^2 *" = 0.73"),cex=1.4)
+
 plot(totdata$ModelledBa[totdata$Pft=="NC"],totdata$FiaBa[totdata$Pft=="NC"],
      xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(11.25,29.5,"Northern Temperate Conifer",cex=1.4)
+text(10.9,29.5,"Northern Temperate Conifer",cex=1.4)
+text(3.65,27,expression(italic(r)^2 *" = 0.67"),cex=1.4)
+
 plot(totdata$ModelledBa[totdata$Pft=="NH"],totdata$FiaBa[totdata$Pft=="NH"],
      xlim=c(0,30),ylim=c(0,30),las=1,xaxt="n",yaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 axis(side=2,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(12.25,29.5,"Northern Temperate Hardwood",cex=1.4)
+text(12.2,29.5,"Northern Temperate Hardwood",cex=1.4)
+text(3.65,27,expression(italic(r)^2 *" = 0.90"),cex=1.4)
+
 plot(totdata$ModelledBa[totdata$Pft=="SC"],totdata$FiaBa[totdata$Pft=="SC"],
      xlim=c(0,30),ylim=c(0,30),las=1,cex=1.8,cex.axis=1.2)
 abline(0,1,lwd=2,lty=2)
-text(11.5,29.5,"Southern Temperate Conifer",cex=1.4)
+text(11,29.5,"Southern Temperate Conifer",cex=1.4)
+text(3.65,27,expression(italic(r)^2 *" = 0.79"),cex=1.4)
+
 plot(totdata$ModelledBa[totdata$Pft=="SH"],totdata$FiaBa[totdata$Pft=="SH"],
      xlim=c(0,30),ylim=c(0,30),las=1,yaxt="n",cex=1.8,cex.axis=1.2)
 axis(side=1,at=seq(0,30,5),labels=F)
 abline(0,1,lwd=2,lty=2)
-text(12.5,29.5,"Southern Temperate Hardwood",cex=1.4)
+text(12.2,29.5,"Southern Temperate Hardwood",cex=1.4)
+text(3.65,27,expression(italic(r)^2 *" = 0.89"),cex=1.4)
 
 mtext(expression("Observed basal area (m"^2*" ha"^-1*")"),
       side=2, line=2, outer=TRUE, adj=0.5, cex=1)
@@ -207,6 +218,14 @@ mtext(expression("Predicted basal area (m"^2*" ha"^-1*")"),
       side=1, line=2.5, outer=TRUE, adj=0.5, cex=1)
 
 dev.off()
+
+#r2 values for in MS
+(cor(totdata$ModelledBa[totdata$Pft=="BC"],totdata$FiaBa[totdata$Pft=="BC"]))^2     #BC 0.76
+(cor(totdata$ModelledBa[totdata$Pft=="BH"],totdata$FiaBa[totdata$Pft=="BH"]))^2     #BH 0.73
+(cor(totdata$ModelledBa[totdata$Pft=="NC"],totdata$FiaBa[totdata$Pft=="NC"]))^2     #NC 0.67
+(cor(totdata$ModelledBa[totdata$Pft=="NH"],totdata$FiaBa[totdata$Pft=="NH"]))^2     #NH 0.90
+(cor(totdata$ModelledBa[totdata$Pft=="SC"],totdata$FiaBa[totdata$Pft=="SC"]))^2     #SC 0.79
+(cor(totdata$ModelledBa[totdata$Pft=="SH"],totdata$FiaBa[totdata$Pft=="SH"]))^2     #SH 0.89
 
 ##############################################################
 ##FIGURE: Observed vs. predicted size distribution
